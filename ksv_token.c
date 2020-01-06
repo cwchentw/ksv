@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include "print.h"
-#include "token.h"
+#include "ksv_token.h"
 
 struct ksv_token_t {
     KSV_TOKEN_TYPE type;

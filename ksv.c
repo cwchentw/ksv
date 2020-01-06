@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "ksv.h"
-#include "lexer.h"
+#include "ksv_lexer.h"
 #include "print.h"
 
 struct ksv_t {

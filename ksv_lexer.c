@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "cstring.h"
-#include "lexer.h"
+#include "ksv_lexer.h"
+#include "ksv_token.h"
 #include "print.h"
-#include "token.h"
 
 struct ksv_lexer_t {
     char *delimeter;

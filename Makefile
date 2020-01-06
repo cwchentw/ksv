@@ -23,9 +23,9 @@ endif
 endif
 
 ifneq (,$(findstring $(CC),cl.exe))
-	OBJS=cstring.obj token.obj lexer.obj ksv.obj
+	OBJS=cstring.obj ksv_token.obj ksv_lexer.obj ksv.obj
 else
-	OBJS=cstring.o token.o lexer.o ksv.o
+	OBJS=cstring.o ksv_token.o ksv_lexer.o ksv.o
 endif
 
 
