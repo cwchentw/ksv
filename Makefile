@@ -28,8 +28,6 @@ else
 	OBJS=cstring.o token.o lexer.o ksv.o
 endif
 
-DYNAMIC := all dynamic
-
 
 .PHONY: all dynamic static clean_obj clean
 
@@ -64,7 +62,7 @@ endif
 	$(CC) /c $< $(CFLAGS)
 
 %.o: %.c
-ifneq (, $(filter $(MAKECMDGOALS),$(DYNAMIC)))
+ifeq (dynamic,$(MAKECMDGOALS))
 	$(CC) -fPIC -c $< $(CFLAGS)
 else
 	$(CC) -c $< $(CFLAGS)
