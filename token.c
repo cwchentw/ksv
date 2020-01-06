@@ -3,15 +3,15 @@
 #include "print.h"
 #include "token.h"
 
-struct csv_token_t {
-    CSV_TOKEN_TYPE type;
+struct ksv_token_t {
+    KSV_TOKEN_TYPE type;
     char *string;
 };
 
-csv_token_t * csv_token_new(CSV_TOKEN_TYPE type, char *string)
+ksv_token_t * ksv_token_new(KSV_TOKEN_TYPE type, char *string)
 {
-    csv_token_t *token = \
-        (csv_token_t *) malloc(sizeof(csv_token_t));
+    ksv_token_t *token = \
+        (ksv_token_t *) malloc(sizeof(ksv_token_t));
     if (!token) {
         PUTERR("Failed to allocate memory for csv token");
         PUTERR("Check available system memory");
@@ -24,11 +24,11 @@ csv_token_t * csv_token_new(CSV_TOKEN_TYPE type, char *string)
     return token;
 }
 
-void csv_token_delete(void *self)
+void ksv_token_delete(void *self)
 {
     assert(self);
 
-    char *string = ((csv_token_t *) self)->string;
+    char *string = ((ksv_token_t *) self)->string;
     if (string)
         free((void *) string);
 

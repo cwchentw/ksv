@@ -6,19 +6,19 @@
 #include "print.h"
 #include "token.h"
 
-struct csv_lexer_t {
+struct ksv_lexer_t {
     char *delimeter;
     char *end_of_line;
     char quote;
     size_t size;
     size_t capacity;
     size_t index;
-    csv_token_t **tokens;
+    ksv_token_t **tokens;
 };
 
-csv_lexer_t * csv_lexer_new(char *delimeter, char *end_of_line, char quote)
+ksv_lexer_t * ksv_lexer_new(char *delimeter, char *end_of_line, char quote)
 {
-    csv_lexer_t *lexer = (csv_lexer_t *) malloc(sizeof(csv_lexer_t));
+    ksv_lexer_t *lexer = (ksv_lexer_t *) malloc(sizeof(ksv_lexer_t));
     if (!lexer) {
         PUTERR("Failed to allocate memory for csv lexer");
         PUTERR("Check available system memory");
@@ -34,7 +34,7 @@ csv_lexer_t * csv_lexer_new(char *delimeter, char *end_of_line, char quote)
     lexer->index = 0;
 
     lexer->tokens = \
-        (csv_token_t **) malloc(lexer->capacity * sizeof(csv_token_t *));
+        (ksv_token_t **) malloc(lexer->capacity * sizeof(ksv_token_t *));
     if (!(lexer->tokens)) {
         PUTERR("Failed to allocate memory for tokens of csv lexer");
         PUTERR("Check available system memory");
@@ -45,9 +45,9 @@ csv_lexer_t * csv_lexer_new(char *delimeter, char *end_of_line, char quote)
     return lexer;
 }
 
-static BOOL csv_lexer_push(csv_lexer_t *self, csv_token_t *token);
+static BOOL ksv_lexer_push(ksv_lexer_t *self, ksv_token_t *token);
 
-BOOL csv_lexer_lex(csv_lexer_t *self, char *input)
+BOOL ksv_lexer_lex(ksv_lexer_t *self, char *input)
 {
     assert(self);
 
@@ -63,12 +63,12 @@ BOOL csv_lexer_lex(csv_lexer_t *self, char *input)
                     if (!eol)
                         return FALSE;
                     
-                    csv_token_t *token = \
-                        csv_token_new(CSV_TOKEN_END_OF_LINE, eol);
+                    ksv_token_t *token = \
+                        ksv_token_new(KSV_TOKEN_END_OF_LINE, eol);
                     if (!token)
                         return FALSE;
 
-                    if (!csv_lexer_push(self, token))
+                    if (!ksv_lexer_push(self, token))
                         return FALSE;
                 }
                 else {
@@ -82,12 +82,12 @@ BOOL csv_lexer_lex(csv_lexer_t *self, char *input)
                         if (!eol)
                             return FALSE;
 
-                        csv_token_t *token = \
-                            csv_token_new(CSV_TOKEN_END_OF_LINE, eol);
+                        ksv_token_t *token = \
+                            ksv_token_new(KSV_TOKEN_END_OF_LINE, eol);
                         if (!token)
                             return FALSE;
 
-                        if (!csv_lexer_push(self, token))
+                        if (!ksv_lexer_push(self, token))
                             return FALSE;
 
                         i += 1;
@@ -102,12 +102,12 @@ BOOL csv_lexer_lex(csv_lexer_t *self, char *input)
                 if (!quote)
                     return FALSE;
 
-                csv_token_t *token = \
-                    csv_token_new(CSV_TOKEN_QUOTE, quote);
+                ksv_token_t *token = \
+                    ksv_token_new(KSV_TOKEN_QUOTE, quote);
                 if (!token)
                     return FALSE;
 
-                if (!csv_lexer_push(self, token))
+                if (!ksv_lexer_push(self, token))
                     return FALSE;
             }
             else {
@@ -122,12 +122,12 @@ BOOL csv_lexer_lex(csv_lexer_t *self, char *input)
                 if (!s)
                     return FALSE;
 
-                csv_token_t *token = \
-                    csv_token_new(CSV_TOKEN_STRING, s);
+                ksv_token_t *token = \
+                    ksv_token_new(KSV_TOKEN_STRING, s);
                 if (!token)
                     return FALSE;
 
-                if (!csv_lexer_push(self, token))
+                if (!ksv_lexer_push(self, token))
                     return FALSE;
             }
         }
@@ -136,13 +136,13 @@ BOOL csv_lexer_lex(csv_lexer_t *self, char *input)
     return TRUE;
 }
 
-static BOOL csv_lexer_expand(csv_lexer_t *self);
+static BOOL ksv_lexer_expand(ksv_lexer_t *self);
 
-static BOOL csv_lexer_push(csv_lexer_t *self, csv_token_t *token)
+static BOOL ksv_lexer_push(ksv_lexer_t *self, ksv_token_t *token)
 {
     assert(self);
 
-    if (!csv_lexer_expand(self))
+    if (!ksv_lexer_expand(self))
         return FALSE;
 
     self->tokens[self->size] = token;
@@ -151,7 +151,7 @@ static BOOL csv_lexer_push(csv_lexer_t *self, csv_token_t *token)
     return TRUE;
 }
 
-static BOOL csv_lexer_expand(csv_lexer_t *self)
+static BOOL ksv_lexer_expand(ksv_lexer_t *self)
 {
     assert(self);
 
@@ -159,9 +159,9 @@ static BOOL csv_lexer_expand(csv_lexer_t *self)
         return TRUE;
 
     self->capacity <<= 1;
-    csv_token_t **old_tokens = self->tokens;
-    csv_token_t **new_tokens = \
-        (csv_token_t **) malloc(self->capacity * sizeof(csv_token_t *));
+    ksv_token_t **old_tokens = self->tokens;
+    ksv_token_t **new_tokens = \
+        (ksv_token_t **) malloc(self->capacity * sizeof(ksv_token_t *));
     if (!new_tokens) {
         PUTERR("Failed to allocate tokens for csv lexer");
         PUTERR("Check available system memory");
@@ -186,18 +186,18 @@ static BOOL csv_lexer_expand(csv_lexer_t *self)
     return TRUE;
 }
 
-void csv_lexer_delete(void *self)
+void ksv_lexer_delete(void *self)
 {
     assert(self);
 
-    size_t capacity = ((csv_lexer_t *) self)->capacity;
-    csv_token_t **tokens = ((csv_lexer_t *) self)->tokens;
+    size_t capacity = ((ksv_lexer_t *) self)->capacity;
+    ksv_token_t **tokens = ((ksv_lexer_t *) self)->tokens;
     
     {
         size_t i;
         for (i = 0; i < capacity; i++) {
             if (tokens[i])
-                csv_token_delete(tokens[i]);
+                ksv_token_delete(tokens[i]);
         }
     }
 

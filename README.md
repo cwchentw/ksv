@@ -1,4 +1,4 @@
-# csv-c
+# ksv
 
 Yet another CSV library for C.
 

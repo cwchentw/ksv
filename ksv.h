@@ -1,5 +1,5 @@
-#ifndef CSV_H
-#define CSV_H
+#ifndef KSV_H
+#define KSV_H
 
 #ifdef __cplusplus
     #include <cstdio>
@@ -16,19 +16,19 @@
     #include "boolean.h"
 #endif
 
-typedef struct csv_t csv_t;
+typedef struct ksv_t ksv_t;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-csv_t * csv_new_default(void);
-csv_t * csv_new(char *delimeter, char *end_of_line, char quote);
-BOOL csv_load_stream_with_header_strictly(csv_t *self, FILE *stream);
-void csv_delete(void *self);
+ksv_t * ksv_new_default(void);
+ksv_t * ksv_new(char *delimeter, char *end_of_line, char quote);
+BOOL ksv_load_stream_with_header_strictly(ksv_t *self, FILE *stream);
+void ksv_delete(void *self);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif  /* CSV_H */
+#endif  /* KSV_H */

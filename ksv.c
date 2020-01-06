@@ -1,11 +1,11 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-#include "csv.h"
+#include "ksv.h"
 #include "lexer.h"
 #include "print.h"
 
-struct csv_t {
+struct ksv_t {
     size_t row;
     size_t col;
     size_t capacity;
@@ -16,7 +16,7 @@ struct csv_t {
     char quote;
 };
 
-csv_t * csv_new_default(void)
+ksv_t * ksv_new_default(void)
 {
 #ifndef END_OF_LINE
     #ifdef _WIN32
@@ -28,16 +28,16 @@ csv_t * csv_new_default(void)
     #endif
 #endif  /* END_OF_LINE */
 
-    return csv_new(",", END_OF_LINE, '"');
+    return ksv_new(",", END_OF_LINE, '"');
 }
 
-csv_t * csv_new(char *delimeter, char *end_of_line, char quote)
+ksv_t * ksv_new(char *delimeter, char *end_of_line, char quote)
 {
     assert(0 != strcmp("", delimeter));
     assert(0 != strcmp("", end_of_line));
     assert(!quote);
 
-    csv_t *csv = (csv_t *) malloc(sizeof(csv_t));
+    ksv_t *csv = (ksv_t *) malloc(sizeof(ksv_t));
     if (!csv) {
         PUTERR("Failed to allocate csv object");
         PUTERR("Check available system memory");
@@ -53,7 +53,7 @@ csv_t * csv_new(char *delimeter, char *end_of_line, char quote)
     if (!(csv->rows)) {
         PUTERR("Failed to allocate rows for csv object");
         PUTERR("Check available system memory");
-        csv_delete(csv);
+        ksv_delete(csv);
         return NULL;
     }
 
@@ -70,12 +70,12 @@ csv_t * csv_new(char *delimeter, char *end_of_line, char quote)
     return csv;
 }
 
-BOOL csv_load_stream_with_header_strictly(csv_t *self, FILE *stream)
+BOOL ksv_load_stream_with_header_strictly(ksv_t *self, FILE *stream)
 {
     assert(self);
 
     char *line = NULL;
-    csv_lexer_t *lexer = NULL;
+    ksv_lexer_t *lexer = NULL;
 
     size_t line_width = 150;  /* Sensible initial line width. */
     line = (char *) malloc(line_width * sizeof(char));
@@ -102,7 +102,7 @@ BOOL csv_load_stream_with_header_strictly(csv_t *self, FILE *stream)
         }
         else {
     LOAD_LINE:
-            lexer = csv_lexer_new(
+            lexer = ksv_lexer_new(
                 self->delimeter,
                 self->end_of_line,
                 self->quote
@@ -110,7 +110,7 @@ BOOL csv_load_stream_with_header_strictly(csv_t *self, FILE *stream)
             if (!lexer)
                 goto ERROR_CSV;
             
-            if (!csv_lexer_lex(lexer, line))
+            if (!ksv_lexer_lex(lexer, line))
                 goto ERROR_CSV;
     
             if (!visited) {
@@ -120,7 +120,7 @@ BOOL csv_load_stream_with_header_strictly(csv_t *self, FILE *stream)
                 /* Parse csv row. */
             }
             
-            csv_lexer_delete(lexer);
+            ksv_lexer_delete(lexer);
             lexer = NULL;
         }
     }
@@ -129,7 +129,7 @@ BOOL csv_load_stream_with_header_strictly(csv_t *self, FILE *stream)
 
 ERROR_CSV:
     if (lexer)
-        csv_lexer_delete(lexer);
+        ksv_lexer_delete(lexer);
 
     if (line)
         free(line);
@@ -137,14 +137,14 @@ ERROR_CSV:
     return FALSE;
 }
 
-void csv_delete(void *self)
+void ksv_delete(void *self)
 {
     assert(self);
 
-    size_t row = ((csv_t *) self)->row;
-    size_t col = ((csv_t *) self)->col;
+    size_t row = ((ksv_t *) self)->row;
+    size_t col = ((ksv_t *) self)->col;
 
-    char **header = ((csv_t *) self)->header;
+    char **header = ((ksv_t *) self)->header;
     if (header) {
         size_t i;
         for (i = 0; i < col; i++) {
@@ -153,7 +153,7 @@ void csv_delete(void *self)
         }
     }
 
-    char ***rows = ((csv_t *) self)->rows;
+    char ***rows = ((ksv_t *) self)->rows;
     if (rows) {
         size_t i;
         for (i = 0; i < row; i++) {
