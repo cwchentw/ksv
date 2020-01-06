@@ -8,6 +8,25 @@ ifneq (,$(findstring $(CC),cl.exe))
 	RM=del /q /f
 endif
 
+CC=
+ifeq (,$(CC))
+ifeq ($(detected_OS),Windows)
+	CC=cl.exe
+else
+ifeq ($(detected_OS),Darwin)
+	CC=clang
+else
+	CC=gcc
+endif  # Darwin
+endif  # Windows
+endif  # CC
+
+ifeq ($(detected_OS),Windows)
+	TARGET=ksv.exe
+else
+	TARGET=ksv
+endif
+
 ifneq (,$(findstring $(CC),cl.exe))
 	LIB_STATIC=ksv.lib
 	LIB_DYNAMIC=ksv.dll
@@ -22,19 +41,39 @@ endif
 	CFLAGS=-Wall -Wextra -std=c89
 endif
 
+ifneq (,$(DEBUG))
+ifneq (,$(findstring $(CC),cl.exe))
+	CFLAGS+=/D DEBUG
+else
+	CFLAGS+=-DDEBUG
+endif
+endif
+
 ifneq (,$(findstring $(CC),cl.exe))
 	OBJS=cstring.obj ksv_token.obj ksv_lexer.obj ksv.obj
+	EXEC_OBJS=ksv_cli.obj
 else
 	OBJS=cstring.o ksv_token.o ksv_lexer.o ksv.o
+	EXEC_OBJS=ksv_cli.o
 endif
 
 
-.PHONY: all dynamic static clean_obj clean
+.PHONY: all dynamic static exec clean_obj clean
 
 all:
 	$(MAKE) dynamic
 	$(MAKE) clean_obj
 	$(MAKE) static
+	$(MAKE) exec
+
+exec: $(TARGET)
+
+$(TARGET): $(LIB_STATIC) $(EXEC_OBJS)
+ifneq (,$(findstring $(CC),cl.exe))
+	$(CC) /Fe: $(TARGET) $(EXEC_OBJS) $(LIB_STATIC) $(CFLAGS)
+else
+	$(CC) -o $(TARGET) $(EXEC_OBJS) $(LIB_STATIC) $(CFLAGS)
+endif
 
 dynamic: $(LIB_DYNAMIC)
 
@@ -72,4 +111,4 @@ clean_obj:
 	$(RM) $(OBJS)
 
 clean:
-	$(RM) $(OBJS) $(LIB_DYNAMIC) $(LIB_STATIC)
+	$(RM) $(OBJS) $(EXEC_OBJS) $(LIB_DYNAMIC) $(LIB_STATIC) $(TARGET)

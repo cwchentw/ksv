@@ -35,7 +35,7 @@ ksv_t * ksv_new(char *delimeter, char *end_of_line, char quote)
 {
     assert(0 != strcmp("", delimeter));
     assert(0 != strcmp("", end_of_line));
-    assert(!quote);
+    assert(quote);
 
     ksv_t *csv = (ksv_t *) malloc(sizeof(ksv_t));
     if (!csv) {
@@ -109,10 +109,10 @@ BOOL ksv_load_stream_with_header_strictly(ksv_t *self, FILE *stream)
             );
             if (!lexer)
                 goto ERROR_CSV;
-            
+
             if (!ksv_lexer_lex(lexer, line))
                 goto ERROR_CSV;
-    
+
             if (!visited) {
                 /* Parse csv header. */
             }
