@@ -1,6 +1,8 @@
 #ifndef KSV_AST_H
 #define KSV_AST_H
 
+#include "ksv_token.h"
+
 typedef struct ksv_ast_t ksv_ast_t;
 
 typedef unsigned char KSV_AST_TYPE;
@@ -10,5 +12,6 @@ typedef unsigned char KSV_AST_TYPE;
 
 ksv_ast_t * ksv_ast_new(KSV_AST_TYPE type);
 void ksv_ast_delete(void *self);
+BOOL ksv_ast_add_token(ksv_ast_t *self, ksv_token_t *token);
 
 #endif  /* KSV_AST_H */

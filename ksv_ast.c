@@ -214,3 +214,111 @@ static void ksv_ast_eol_delete(void *self)
 
     free(self);
 }
+
+static BOOL ksv_ast_field_add_token(ksv_ast_field_t *self, ksv_token_t *token);
+static BOOL ksv_ast_delimiter_add_token(ksv_ast_delimiter_t *self, ksv_token_t *token);
+static BOOL ksv_ast_eol_add_token(ksv_ast_eol_t *self, ksv_token_t *token);
+
+BOOL ksv_ast_add_token(ksv_ast_t *self, ksv_token_t *token)
+{
+    assert(self);
+    assert(token);
+
+    switch (self->type) {
+    case KSV_AST_FIELD:
+        if (!ksv_ast_field_add_token(self->ast.field, token))
+            return FALSE;
+        break;
+    case KSV_AST_DELIMITER:
+        if (!ksv_ast_delimiter_add_token(self->ast.delimiter, token))
+            return FALSE;
+        break;
+    case KSV_AST_EOL:
+        if (!ksv_ast_eol_add_token(self->ast.eol, token))
+            return FALSE;
+        break;
+    default:
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
+static BOOL ksv_ast_field_expand(ksv_ast_field_t *self);
+
+static BOOL ksv_ast_field_add_token(ksv_ast_field_t *self, ksv_token_t *token)
+{
+    assert(self);
+    assert(token);
+
+    if (!ksv_ast_field_expand(self))
+        return FALSE;
+
+    self->tokens[self->size] = token;
+    self->size += 1;
+
+    return TRUE;
+}
+
+static BOOL ksv_ast_field_expand(ksv_ast_field_t *self)
+{
+    assert(self);
+
+    if (self->size + 1 <= self->capacity)
+        return TRUE;
+
+    self->capacity <<= 1;
+    ksv_token_t **old_tokens = self->tokens;
+    ksv_token_t **new_tokens = \
+        (ksv_token_t **) malloc(self->capacity * sizeof(ksv_token_t *));
+    if (!new_tokens) {
+        PUTERR("Failed to allocate the tokens of ksv field ast");
+        PUTERR("Check available system memory");
+        return FALSE;
+    }
+
+    {
+        size_t i;
+        for (i = 0; i < self->size; i++)
+            new_tokens[i] = old_tokens[i];
+    }
+
+    {
+        size_t i;
+        for (i = self->size; i <= self->capacity; i++)
+            new_tokens[i] = NULL;
+    }
+
+    self->tokens = new_tokens;
+    free(old_tokens);
+
+    return TRUE;
+}
+
+static BOOL ksv_ast_delimiter_add_token(ksv_ast_delimiter_t *self, ksv_token_t *token)
+{
+    assert(self);
+    assert(token);
+
+    if (self->size > 0)
+        return FALSE;
+
+    self->token = token;
+    self->size += 1;
+
+    return TRUE;
+}
+
+static BOOL ksv_ast_eol_add_token(ksv_ast_eol_t *self, ksv_token_t *token)
+{
+    assert(self);
+    assert(token);
+
+    if (self->size > 0)
+        return FALSE;
+
+    self->token = token;
+    self->size += 1;
+
+    return TRUE;
+}
