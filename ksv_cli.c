@@ -15,11 +15,18 @@ int main(int argc, char *argv[])
     /* Refactor it later. */
     const char *path = argv[1];
 
+#if _MSC_VER
+    if (0 != fopen_s(&fp, path, "r")) {
+        PUTERR("Failed to open file at %s", path);
+        return 1;
+    }
+#else
     fp = fopen(path, "r");
     if (!fp) {
         PUTERR("Failed to open file at %s", path);
         return 1;
     }
+#endif
 
     ksv = ksv_new_default();
     if (!ksv)
