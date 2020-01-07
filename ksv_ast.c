@@ -1,0 +1,216 @@
+#include <assert.h>
+#include <stdlib.h>
+#include "ksv.h"
+#include "ksv_ast.h"
+#include "ksv_token.h"
+#include "print.h"
+
+typedef struct ksv_ast_field_t ksv_ast_field_t;
+typedef struct ksv_ast_delimiter_t ksv_ast_delimiter_t;
+typedef struct ksv_ast_eol_t ksv_ast_eol_t;
+
+struct ksv_ast_t {
+    KSV_AST_TYPE type;
+    union {
+        ksv_ast_field_t *field;
+        ksv_ast_delimiter_t *delimiter;
+        ksv_ast_eol_t *eol;
+    } ast;
+};
+
+static BOOL is_valid_ast_type(type);
+static ksv_ast_field_t * ksv_ast_field_new(void);
+static ksv_ast_delimiter_t * ksv_ast_delimiter_new(void);
+static ksv_ast_eol_t * ksv_ast_eol_new(void);
+
+ksv_ast_t * ksv_ast_new(KSV_AST_TYPE type)
+{
+    assert(is_valid_ast_type(type));
+
+    ksv_ast_t *ast = \
+        (ksv_ast_t *) malloc(sizeof(ksv_ast_t));
+    if (!ast) {
+        PUTERR("Failed to allocate memory for ksv ast");
+        PUTERR("Check available system memory");
+        return ast;
+    }
+
+    ast->type = type;
+
+    switch (ast->type) {
+    case KSV_AST_FIELD:
+        ast->ast.field = ksv_ast_field_new();
+        if (!(ast->ast.field))
+            goto ERROR_AST;
+        break;
+    case KSV_AST_DELIMITER:
+        ast->ast.delimiter = ksv_ast_delimiter_new();
+        if (!(ast->ast.delimiter))
+            goto ERROR_AST;
+        break;
+    case KSV_AST_EOL:
+        ast->ast.eol = ksv_ast_eol_new();
+        if (!(ast->ast.eol))
+            goto ERROR_AST;
+        break;
+    }
+
+    return ast;
+
+ERROR_AST:
+    ksv_ast_delete(ast);
+
+    return NULL;
+}
+
+static BOOL is_valid_ast_type(type)
+{
+    return KSV_AST_FIELD == type
+        || KSV_AST_DELIMITER == type
+        || KSV_AST_EOL == type;
+}
+
+struct ksv_ast_field_t {
+    size_t size;
+    size_t capacity;
+    ksv_token_t **tokens;
+};
+
+static ksv_ast_field_t * ksv_ast_field_new(void)
+{
+    ksv_ast_field_t *ast = \
+        (ksv_ast_field_t *) malloc(sizeof(ksv_ast_field_t));
+    if (!ast) {
+        PUTERR("Failed to allocate memory for ksv field ast");
+        PUTERR("Check available system memory");
+        return ast;
+    }
+
+    ast->size = 0;
+    ast->capacity = 4;  /* Sensible initial capacity. */
+
+    ast->tokens = \
+        (ksv_token_t **) malloc(ast->capacity * sizeof(ksv_token_t *));
+    if (!(ast->tokens)) {
+        PUTERR("Failed to allocate memory for the tokens of ksv field ast");
+        PUTERR("Check available system memory");
+        free(ast);
+        return NULL;
+    }
+
+    {
+        size_t i;
+        for (i = 0; i < ast->capacity; i++)
+            ast->tokens[i] = NULL;
+    }
+
+    return ast;
+}
+
+struct ksv_ast_delimiter_t {
+    size_t size;
+    ksv_token_t *token;
+};
+
+static ksv_ast_delimiter_t * ksv_ast_delimiter_new(void)
+{
+    ksv_ast_delimiter_t *ast = \
+        (ksv_ast_delimiter_t *) malloc(sizeof(ksv_ast_delimiter_t));
+    if (!ast) {
+        PUTERR("Failed to allocate memory for ksv delimiter ast");
+        PUTERR("Check available system memory");
+        return ast;
+    }
+
+    ast->size = 0;
+    ast->token = NULL;
+
+    return ast;
+}
+
+struct ksv_ast_eol_t {
+    size_t size;
+    ksv_token_t *token;
+};
+
+static ksv_ast_eol_t * ksv_ast_eol_new(void)
+{
+    ksv_ast_eol_t *ast = (ksv_ast_eol_t *) malloc(sizeof(ksv_ast_eol_t));
+    if (!ast) {
+        PUTERR("Failed to allocate memory for ksv eol ast");
+        PUTERR("Check available system memory");
+        return ast;
+    }
+
+    ast->size = 0;
+    ast->token = NULL;
+
+    return ast;
+}
+
+static void ksv_ast_field_delete(void *self);
+static void ksv_ast_delimiter_delete(void *self);
+static void ksv_ast_eol_delete(void *self);
+
+void ksv_ast_delete(void *self)
+{
+    assert(self);
+
+    KSV_AST_TYPE type = ((ksv_ast_t *) self)->type;
+
+    switch (type) {
+    case KSV_AST_FIELD:
+        ksv_ast_field_delete(
+            (void *) ((ksv_ast_t *) self)->ast.field);
+        break;
+    case KSV_AST_DELIMITER:
+        ksv_ast_delimiter_delete(
+            (void *) ((ksv_ast_t *) self)->ast.delimiter);
+        break;
+    case KSV_AST_EOL:
+        ksv_ast_eol_delete(
+            (void *) ((ksv_ast_t *) self)->ast.eol);
+        break;
+    }
+
+    free(self);
+}
+
+static void ksv_ast_field_delete(void *self)
+{
+    assert(self);
+
+    size_t capacity = ((ksv_ast_field_t *) self)->capacity;
+    ksv_token_t **tokens = ((ksv_ast_field_t *) self)->tokens;
+    {
+        size_t i;
+        for (i = 0; i < capacity; i++) {
+            if (tokens[i])
+                ksv_token_delete(tokens[i]);
+        }
+    }
+
+    free(self);
+}
+
+static void ksv_ast_delimiter_delete(void *self)
+{
+    assert(self);
+
+    ksv_token_t *token = ((ksv_ast_delimiter_t *) self)->token;
+    if (token)
+        ksv_token_delete(token);
+
+    free(self);
+}
+
+static void ksv_ast_eol_delete(void *self)
+{
+    assert(self);
+
+    ksv_token_t *token = ((ksv_ast_eol_t *) self)->token;
+    if (token)
+        ksv_token_delete(token);
+
+    free(self);
+}

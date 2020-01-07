@@ -50,10 +50,10 @@ endif
 endif
 
 ifneq (,$(findstring $(CC),cl.exe))
-	OBJS=cstring.obj ksv_token.obj ksv_lexer.obj ksv.obj
+	OBJS=cstring.obj ksv_token.obj ksv_lexer.obj ksv_ast.obj ksv.obj
 	EXEC_OBJS=ksv_cli.obj
 else
-	OBJS=cstring.o ksv_token.o ksv_lexer.o ksv.o
+	OBJS=cstring.o ksv_token.o ksv_lexer.o ksv_ast.o ksv.o
 	EXEC_OBJS=ksv_cli.o
 endif
 

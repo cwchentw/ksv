@@ -51,6 +51,24 @@ ksv_lexer_t * ksv_lexer_new(char *delimeter, char *end_of_line, char quote)
     return lexer;
 }
 
+void ksv_lexer_delete(void *self)
+{
+    assert(self);
+
+    size_t capacity = ((ksv_lexer_t *) self)->capacity;
+    ksv_token_t **tokens = ((ksv_lexer_t *) self)->tokens;
+    
+    {
+        size_t i;
+        for (i = 0; i < capacity; i++) {
+            if (tokens[i])
+                ksv_token_delete(tokens[i]);
+        }
+    }
+
+    free(self);
+}
+
 static BOOL ksv_lexer_push(ksv_lexer_t *self, ksv_token_t *token);
 
 BOOL ksv_lexer_lex(ksv_lexer_t *self, char *input)
@@ -259,20 +277,22 @@ static BOOL ksv_lexer_expand(ksv_lexer_t *self)
     return TRUE;
 }
 
-void ksv_lexer_delete(void *self)
+void ksv_lexer_start(ksv_lexer_t *self)
 {
     assert(self);
 
-    size_t capacity = ((ksv_lexer_t *) self)->capacity;
-    ksv_token_t **tokens = ((ksv_lexer_t *) self)->tokens;
-    
-    {
-        size_t i;
-        for (i = 0; i < capacity; i++) {
-            if (tokens[i])
-                ksv_token_delete(tokens[i]);
-        }
-    }
+    self->index = 0;
+}
 
-    free(self);
+ksv_token_t * ksv_lexer_next(ksv_lexer_t *self)
+{
+    assert(self);
+
+    if (self->index >= self->size)
+        return NULL;
+
+    ksv_token_t *token = self->tokens[self->index];
+    self->index += 1;
+
+    return token;
 }
