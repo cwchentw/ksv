@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <stdlib.h>
+#include "cstring.h"
 #include "ksv.h"
 #include "ksv_ast.h"
 #include "ksv_token.h"
@@ -321,4 +322,89 @@ static BOOL ksv_ast_eol_add_token(ksv_ast_eol_t *self, ksv_token_t *token)
     self->size += 1;
 
     return TRUE;
+}
+
+static char * ksv_ast_field_string(ksv_ast_field_t *self);
+static char * ksv_ast_delimiter_string(ksv_ast_delimiter_t *self);
+static char * ksv_ast_eol_string(ksv_ast_eol_t *self);
+
+char * ksv_ast_string(ksv_ast_t *self)
+{
+    assert(self);
+
+    char *out = NULL;
+
+    switch(self->type) {
+    case KSV_AST_FIELD:
+        out = ksv_ast_field_string(self->ast.field);
+        break;
+    case KSV_AST_DELIMITER:
+        out = ksv_ast_delimiter_string(self->ast.delimiter);
+        break;
+    case KSV_AST_EOL:
+        out = ksv_ast_eol_string(self->ast.eol);
+        break;
+    }
+
+    return out;
+}
+
+static char * ksv_ast_field_string(ksv_ast_field_t *self)
+{
+    assert(self);
+
+    char *out = NULL;
+    size_t size = 16;  /* Sensible initial size. */
+
+    out = (char *) malloc(size * sizeof(char));
+    if (!out) {
+        PUTERR("Failed to allocate memory for C string");
+        PUTERR("Check available system memory");
+        return out;
+    }
+
+    out[0] = '\0';
+
+    size_t total_size = 0;
+
+    {
+        size_t i;
+        for (i = 0; i < self->size; i++) {
+            total_size += strlen(ksv_token_string(self->tokens[i]));
+
+            while (total_size > size) {
+                size <<= 1;
+                if (!realloc(out, size)) {
+                    PUTERR("Failed to reallocate memory for C string");
+                    PUTERR("Check available system memory");
+                    free(out);
+                    return NULL;
+                }
+            }
+
+        #if _MSC_VER
+            strcat_s(out, size, ksv_token_string(self->tokens[i]));
+        #else
+            strcat(out, ksv_token_string(self->tokens[i]));
+        #endif
+
+            out[total_size] = '\0';
+        }
+    }
+
+    return out;
+}
+
+static char * ksv_ast_delimiter_string(ksv_ast_delimiter_t *self)
+{
+    assert(self);
+
+    return string_allocate(ksv_token_string(self->token));
+}
+
+static char * ksv_ast_eol_string(ksv_ast_eol_t *self)
+{
+    assert(self);
+
+    return string_allocate(ksv_token_string(self->token));
 }
