@@ -192,6 +192,7 @@ static void ksv_ast_field_delete(void *self)
         }
     }
 
+    free(tokens);
     free(self);
 }
 

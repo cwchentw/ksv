@@ -66,6 +66,7 @@ void ksv_lexer_delete(void *self)
         }
     }
 
+    free(tokens);
     free(self);
 }
 

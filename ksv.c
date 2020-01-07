@@ -137,6 +137,8 @@ BOOL ksv_load_stream_with_header_strictly(ksv_t *self, FILE *stream)
         }
     }
 
+    free(line);
+
     return TRUE;
 
 ERROR_CSV:
@@ -166,6 +168,8 @@ void ksv_delete(void *self)
             if (header[i])
                 free((void *) header[i]);
         }
+
+        free(header);
     }
 
     char ***rows = ((ksv_t *) self)->rows;
@@ -181,6 +185,8 @@ void ksv_delete(void *self)
                 free((void *) rows[i]);
             }
         }
+
+        free(rows);
     }
 
     free(self);
