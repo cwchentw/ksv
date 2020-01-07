@@ -4,7 +4,7 @@ else
     detected_OS := $(shell sh -c 'uname -s 2>/dev/null || echo not')
 endif
 
-ifneq (,$(findstring $(CC),cl.exe))
+ifeq ($(detected_OS),Windows)
 	RM=del /q /f
 endif
 
