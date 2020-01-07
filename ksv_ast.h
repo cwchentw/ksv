@@ -1,6 +1,7 @@
 #ifndef KSV_AST_H
 #define KSV_AST_H
 
+#include "ksv.h"
 #include "ksv_token.h"
 
 typedef struct ksv_ast_t ksv_ast_t;
