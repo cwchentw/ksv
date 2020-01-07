@@ -57,7 +57,7 @@ void ksv_lexer_delete(void *self)
 
     size_t capacity = ((ksv_lexer_t *) self)->capacity;
     ksv_token_t **tokens = ((ksv_lexer_t *) self)->tokens;
-    
+
     {
         size_t i;
         for (i = 0; i < capacity; i++) {
@@ -111,7 +111,7 @@ BOOL ksv_lexer_lex(ksv_lexer_t *self, char *input)
                         char *eol = string_allocate("\r\n");
                         if (!eol)
                             return FALSE;
-                    
+
                     #if DEBUG
                         PUTERR("EOL as token: -->%s<--", eol);
                     #endif
@@ -180,13 +180,13 @@ BOOL ksv_lexer_lex(ksv_lexer_t *self, char *input)
 
                     if (0 == strcmp("\n", self->end_of_line) && '\n' == input[j])
                         break;
-                    
+
                     if (0 == strcmp("\r\n", self->end_of_line)
                         && '\r' == input[j]
                         && j+1 > strlen(input)
                         && '\n' == input[j+1])
                         break;
-                    
+
                     size_t k;
                     BOOL is_delim = TRUE;
                     for (k = 0; k < strlen(self->delimeter) && j+k < strlen(input); k++) {
@@ -205,7 +205,7 @@ BOOL ksv_lexer_lex(ksv_lexer_t *self, char *input)
                 char *s = string_allocate_substring(input, i, j - 1);
                 if (!s)
                     return FALSE;
-            
+
             #if DEBUG
                 PUTERR("String as token: -->%s<--", s);
             #endif

@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <stdlib.h>
+#include <string.h>
 #include "cstring.h"
 #include "ksv.h"
 #include "ksv_ast.h"
@@ -19,7 +20,7 @@ struct ksv_ast_t {
     } ast;
 };
 
-static BOOL is_valid_ast_type(type);
+static BOOL is_valid_ast_type(KSV_AST_TYPE type);
 static ksv_ast_field_t * ksv_ast_field_new(void);
 static ksv_ast_delimiter_t * ksv_ast_delimiter_new(void);
 static ksv_ast_eol_t * ksv_ast_eol_new(void);
@@ -64,7 +65,7 @@ ERROR_AST:
     return NULL;
 }
 
-static BOOL is_valid_ast_type(type)
+static BOOL is_valid_ast_type(KSV_AST_TYPE type)
 {
     return KSV_AST_FIELD == type
         || KSV_AST_DELIMITER == type

@@ -93,7 +93,7 @@ BOOL ksv_parser_parse(ksv_parser_t *self, ksv_lexer_t *lexer)
                             if (!ksv_ast_add_token(ast, token))
                                 goto ERROR_KSV_PARSER;
                         }
-                        
+
                         /* Keep consuming quoted string. */
                         token = ksv_lexer_next(lexer);
                     }
@@ -129,7 +129,7 @@ BOOL ksv_parser_parse(ksv_parser_t *self, ksv_lexer_t *lexer)
 
             if (!ksv_ast_add_token(ast, token))
                 goto ERROR_KSV_PARSER;
-            
+
             token = ksv_lexer_next(lexer);  /* Token for next round. */
         }
         else if (token && KSV_TOKEN_END_OF_LINE == ksv_token_type(token)) {

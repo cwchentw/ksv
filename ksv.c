@@ -119,7 +119,7 @@ BOOL ksv_load_stream_with_header_strictly(ksv_t *self, FILE *stream)
             else {
                 /* Parse csv row. */
             }
-            
+
             ksv_lexer_delete(lexer);
             lexer = NULL;
         }
