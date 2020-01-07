@@ -79,15 +79,14 @@ BOOL ksv_parser_parse(ksv_parser_t *self, ksv_lexer_t *lexer)
             token = ksv_lexer_next(lexer);
             while (token) {
                 if (token && KSV_TOKEN_QUOTE == ksv_token_type(token)) {
-                    ksv_token_t *token_next = ksv_lexer_peek(lexer, 1);
-
-                    if (token_next && KSV_TOKEN_QUOTE == ksv_token_type(token_next)) {
-                        /* Consume escaped quote. */
+                    /* Consume the quote. */
+                    if (token) {
                         if (!ksv_ast_add_token(ast, token))
                             goto ERROR_KSV_PARSER;
+                    }
 
-                        token = ksv_lexer_next(lexer);
-
+                    token = ksv_lexer_next(lexer);
+                    if (token && KSV_TOKEN_QUOTE == ksv_token_type(token)) {
                         /* Consume escaped quote. */
                         if (token) {
                             if (!ksv_ast_add_token(ast, token))
@@ -98,19 +97,20 @@ BOOL ksv_parser_parse(ksv_parser_t *self, ksv_lexer_t *lexer)
                         token = ksv_lexer_next(lexer);
                     }
                     else {
-                        /* Consume ending quote. */
-                        if (token) {
-                            if (!ksv_ast_add_token(ast, token))
-                                goto ERROR_KSV_PARSER;
-                        }
+                    #if DEBUG
+                        char *out = ksv_ast_string(ast);
+                        if (!ast)
+                            goto ERROR_KSV_PARSER;
 
-                        token = ksv_lexer_next(lexer);  /* Token for next round. */
+                        PUTERR("Parse quoted field: -->%s<--", out);
+
+                        free(out);
+                    #endif
+
                         break;
                     }
                 }
                 else {
-                    token = ksv_lexer_next(lexer);
-
                     /* Consume a token greedily. */
                     if (token) {
                         if (!ksv_ast_add_token(ast, token))
@@ -130,6 +130,16 @@ BOOL ksv_parser_parse(ksv_parser_t *self, ksv_lexer_t *lexer)
             if (!ksv_ast_add_token(ast, token))
                 goto ERROR_KSV_PARSER;
 
+        #if DEBUG
+            char *out = ksv_ast_string(ast);
+            if (!out)
+                goto ERROR_KSV_PARSER;
+
+            PUTERR("Parse delimiter: -->%s<--", out);
+
+            free(out);
+        #endif
+
             token = ksv_lexer_next(lexer);  /* Token for next round. */
         }
         else if (token && KSV_TOKEN_END_OF_LINE == ksv_token_type(token)) {
@@ -140,6 +150,17 @@ BOOL ksv_parser_parse(ksv_parser_t *self, ksv_lexer_t *lexer)
             if (!ksv_ast_add_token(ast, token))
                 goto ERROR_KSV_PARSER;
 
+        #if DEBUG
+            char *out = ksv_ast_string(ast);
+            if (!out)
+                goto ERROR_KSV_PARSER;
+
+            PUTERR("Parse EOL: -->%s<--", out);
+
+            free(out);
+        #endif
+
+
             token = ksv_lexer_next(lexer);  /* Token for next round. */
         }
         else if (token && KSV_TOKEN_STRING == ksv_token_type(token)) {
@@ -149,6 +170,16 @@ BOOL ksv_parser_parse(ksv_parser_t *self, ksv_lexer_t *lexer)
 
             if (!ksv_ast_add_token(ast, token))
                 goto ERROR_KSV_PARSER;
+
+        #if DEBUG
+            char *out = ksv_ast_string(ast);
+            if (!out)
+                goto ERROR_KSV_PARSER;
+
+            PUTERR("Parse field: -->%s<--", out);
+
+            free(out);
+        #endif
 
             token = ksv_lexer_next(lexer);  /* Token for next round. */
         }

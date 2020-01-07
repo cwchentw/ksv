@@ -3,6 +3,7 @@
 #include <string.h>
 #include "ksv.h"
 #include "ksv_lexer.h"
+#include "ksv_parser.h"
 #include "print.h"
 
 struct ksv_t {
@@ -76,6 +77,7 @@ BOOL ksv_load_stream_with_header_strictly(ksv_t *self, FILE *stream)
 
     char *line = NULL;
     ksv_lexer_t *lexer = NULL;
+    ksv_parser_t *parser = NULL;
 
     size_t line_width = 150;  /* Sensible initial line width. */
     line = (char *) malloc(line_width * sizeof(char));
@@ -110,7 +112,14 @@ BOOL ksv_load_stream_with_header_strictly(ksv_t *self, FILE *stream)
             if (!lexer)
                 goto ERROR_CSV;
 
+            parser = ksv_parser_new();
+            if (!parser)
+                goto ERROR_CSV;
+
             if (!ksv_lexer_lex(lexer, line))
+                goto ERROR_CSV;
+
+            if (!ksv_parser_parse(parser, lexer))
                 goto ERROR_CSV;
 
             if (!visited) {
@@ -122,12 +131,18 @@ BOOL ksv_load_stream_with_header_strictly(ksv_t *self, FILE *stream)
 
             ksv_lexer_delete(lexer);
             lexer = NULL;
+
+            ksv_parser_delete(parser);
+            parser = NULL;
         }
     }
 
     return TRUE;
 
 ERROR_CSV:
+    if (parser)
+        ksv_parser_delete(parser);
+
     if (lexer)
         ksv_lexer_delete(lexer);
 
