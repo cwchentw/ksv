@@ -296,3 +296,13 @@ ksv_token_t * ksv_lexer_next(ksv_lexer_t *self)
 
     return token;
 }
+
+ksv_token_t * ksv_lexer_peek(ksv_lexer_t *self, size_t n)
+{
+    assert(self);
+
+    if (self->index + n >= self->size)
+        return NULL;
+
+    return self->tokens[self->index + n];
+}

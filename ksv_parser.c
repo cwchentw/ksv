@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "ksv_ast.h"
 #include "ksv_parser.h"
+#include "ksv_token.h"
 #include "print.h"
 
 struct ksv_parser_t {
@@ -57,4 +58,109 @@ void ksv_parser_delete(void *self)
     }
 
     free(self);
+}
+
+BOOL ksv_parser_parse(ksv_parser_t *self, ksv_lexer_t *lexer)
+{
+    assert(self);
+    assert(lexer);
+
+    ksv_token_t *token = ksv_lexer_next(lexer);
+    while (token) {
+        if (token && KSV_TOKEN_QUOTE == ksv_token_type(token)) {
+            ksv_ast_t *ast = ksv_ast_new(KSV_AST_FIELD);
+            if (!ast)
+                goto ERROR_KSV_PARSER;
+
+            /* Consume starting quote. */
+            if (!ksv_ast_add_token(ast, token))
+                goto ERROR_KSV_PARSER;
+
+            token = ksv_lexer_next(lexer);
+            while (token) {
+                if (token && KSV_TOKEN_QUOTE == ksv_token_type(token)) {
+                    ksv_token_t *token_next = ksv_lexer_peek(lexer, 1);
+
+                    if (token_next && KSV_TOKEN_QUOTE == ksv_token_type(token_next)) {
+                        /* Consume escaped quote. */
+                        if (!ksv_ast_add_token(ast, token))
+                            goto ERROR_KSV_PARSER;
+
+                        token = ksv_lexer_next(lexer);
+
+                        /* Consume escaped quote. */
+                        if (token) {
+                            if (!ksv_ast_add_token(ast, token))
+                                goto ERROR_KSV_PARSER;
+                        }
+                        
+                        /* Keep consuming quoted string. */
+                        token = ksv_lexer_next(lexer);
+                    }
+                    else {
+                        /* Consume ending quote. */
+                        if (token) {
+                            if (!ksv_ast_add_token(ast, token))
+                                goto ERROR_KSV_PARSER;
+                        }
+
+                        token = ksv_lexer_next(lexer);  /* Token for next round. */
+                        break;
+                    }
+                }
+                else {
+                    token = ksv_lexer_next(lexer);
+
+                    /* Consume a token greedily. */
+                    if (token) {
+                        if (!ksv_ast_add_token(ast, token))
+                            goto ERROR_KSV_PARSER;
+                    }
+
+                    /* Keep consuming quoted string. */
+                    token = ksv_lexer_next(lexer);
+                }
+            }
+        }
+        else if (token && KSV_TOKEN_DELIMETER == ksv_token_type(token)) {
+            ksv_ast_t *ast = ksv_ast_new(KSV_AST_DELIMITER);
+            if (!ast)
+                goto ERROR_KSV_PARSER;
+
+            if (!ksv_ast_add_token(ast, token))
+                goto ERROR_KSV_PARSER;
+            
+            token = ksv_lexer_next(lexer);  /* Token for next round. */
+        }
+        else if (token && KSV_TOKEN_END_OF_LINE == ksv_token_type(token)) {
+            ksv_ast_t *ast = ksv_ast_new(KSV_AST_EOL);
+            if (!ast)
+                goto ERROR_KSV_PARSER;
+
+            if (!ksv_ast_add_token(ast, token))
+                goto ERROR_KSV_PARSER;
+
+            token = ksv_lexer_next(lexer);  /* Token for next round. */
+        }
+        else if (token && KSV_TOKEN_STRING == ksv_token_type(token)) {
+            ksv_ast_t *ast = ksv_ast_new(KSV_AST_FIELD);
+            if (!ast)
+                goto ERROR_KSV_PARSER;
+
+            if (!ksv_ast_add_token(ast, token))
+                goto ERROR_KSV_PARSER;
+
+            token = ksv_lexer_next(lexer);  /* Token for next round. */
+        }
+        else {
+            PUTERR("Unknown token");
+
+            token = ksv_lexer_next(lexer);  /* Token for next round. */
+        }
+    }
+
+    return TRUE;
+
+ERROR_KSV_PARSER:
+    return FALSE;
 }

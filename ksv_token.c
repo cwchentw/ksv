@@ -35,6 +35,13 @@ void ksv_token_delete(void *self)
     free(self);
 }
 
+KSV_TOKEN_TYPE ksv_token_type(ksv_token_t *self)
+{
+    assert(self);
+
+    return self->type;
+}
+
 char * ksv_token_string(ksv_token_t *self)
 {
     assert(self);
