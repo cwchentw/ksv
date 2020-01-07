@@ -252,7 +252,7 @@ static BOOL ksv_parser_expand(ksv_parser_t *self)
 
     {
         size_t i;
-        for (i = self->size; i <= self->capacity; i++)
+        for (i = self->size; i < self->capacity; i++)
             new_asts[i] = NULL;
     }
 

@@ -184,7 +184,7 @@ BOOL ksv_lexer_lex(ksv_lexer_t *self, char *input)
 
                     if (0 == strcmp("\r\n", self->end_of_line)
                         && '\r' == input[j]
-                        && j+1 > strlen(input)
+                        && j+1 < strlen(input)
                         && '\n' == input[j+1])
                         break;
 
@@ -268,7 +268,7 @@ static BOOL ksv_lexer_expand(ksv_lexer_t *self)
 
     {
         size_t i;
-        for (i = self->size; i <= self->capacity; i++)
+        for (i = self->size; i < self->capacity; i++)
             new_tokens[i] = NULL;
     }
 
@@ -295,7 +295,12 @@ ksv_token_t * ksv_lexer_next(ksv_lexer_t *self)
     ksv_token_t *token = self->tokens[self->index];
     self->index += 1;
 
-    return token;
+    ksv_token_t *copied = ksv_token_new(
+        ksv_token_type(token),
+        string_allocate(ksv_token_string(token))
+    );
+
+    return copied;
 }
 
 ksv_token_t * ksv_lexer_peek(ksv_lexer_t *self, size_t n)
