@@ -12,5 +12,6 @@ typedef unsigned char KSV_TOKEN_TYPE;
 
 ksv_token_t * ksv_token_new(KSV_TOKEN_TYPE type, char *string);
 void ksv_token_delete(void *self);
+char * ksv_token_string(ksv_token_t *self);
 
 #endif  /* KSV_TOKEN_H */

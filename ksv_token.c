@@ -34,3 +34,10 @@ void ksv_token_delete(void *self)
 
     free(self);
 }
+
+char * ksv_token_string(ksv_token_t *self)
+{
+    assert(self);
+
+    return self->string;
+}
