@@ -27,7 +27,9 @@ else
 	TARGET=ksv
 endif
 
-ifneq (,$(findstring $(CC),cl.exe))
+CL := cl icl
+
+ifneq (,$(findstring $(CC),$(CL)))
 	LIB_STATIC=ksv.lib
 	LIB_DYNAMIC=ksv.dll
 	CFLAGS=/W4 /sdl
@@ -42,14 +44,14 @@ endif
 endif
 
 ifneq (,$(DEBUG))
-ifneq (,$(findstring $(CC),cl.exe))
+ifneq (,$(findstring $(CC),$(CL)))
 	CFLAGS+=/D DEBUG
 else
 	CFLAGS+=-DDEBUG
 endif
 endif
 
-ifneq (,$(findstring $(CC),cl.exe))
+ifneq (,$(findstring $(CC),$(CL)))
 	OBJS=cstring.obj ksv_token.obj ksv_lexer.obj \
 		ksv_ast.obj ksv_parser.obj ksv.obj
 	EXEC_OBJS=ksv_cli.obj
@@ -71,8 +73,8 @@ all:
 exec: $(TARGET)
 
 $(TARGET): $(LIB_STATIC) $(EXEC_OBJS)
-ifneq (,$(findstring $(CC),cl.exe))
-	$(CC) /Fe: $(TARGET) $(EXEC_OBJS) $(LIB_STATIC) $(CFLAGS)
+ifneq (,$(findstring $(CC),$(CL)))
+	$(CC) /Fe:$(TARGET) $(EXEC_OBJS) $(LIB_STATIC) $(CFLAGS)
 else
 	$(CC) -o $(TARGET) $(EXEC_OBJS) $(LIB_STATIC) $(CFLAGS)
 endif
@@ -80,7 +82,7 @@ endif
 dynamic: $(LIB_DYNAMIC)
 
 $(LIB_DYNAMIC): $(OBJS)
-ifneq (,$(findstring $(CC),cl.exe))
+ifneq (,$(findstring $(CC),$(CL)))
 	link /DLL /OUT:$(LIB_DYNAMIC) $(OBJS)
 else
 	$(CC) -shared -o $(LIB_DYNAMIC) $(OBJS)
@@ -89,7 +91,7 @@ endif
 static: $(LIB_STATIC)
 
 $(LIB_STATIC): $(OBJS)
-ifneq (,$(findstring $(CC),cl.exe))
+ifneq (,$(findstring $(CC),$(CL)))
 	lib /out:$(LIB_STATIC) $(OBJS)
 else
 ifeq ($(detected_OS),Darwin)
