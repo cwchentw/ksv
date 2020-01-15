@@ -11,7 +11,7 @@ struct ksv_t {
     size_t col;
     size_t capacity;
     char **header;
-    char ***rows;
+    char **rows;
     char *delimeter;
     char *end_of_line;
     char quote;
@@ -50,7 +50,7 @@ ksv_t * ksv_new(char *delimeter, char *end_of_line, char quote)
     csv->capacity = 16;
 
     csv->header = NULL;
-    csv->rows = (char ***) malloc(csv->capacity * sizeof(char **));
+    csv->rows = (char **) malloc(csv->capacity * sizeof(char *));
     if (!(csv->rows)) {
         PUTERR("Failed to allocate rows for csv object");
         PUTERR("Check available system memory");
@@ -172,21 +172,16 @@ void ksv_delete(void *self)
         free(header);
     }
 
-    char ***rows = ((ksv_t *) self)->rows;
+    char **rows = ((ksv_t *) self)->rows;
     if (rows) {
         size_t i;
         for (i = 0; i < row; i++) {
             if (rows[i]) {
-                size_t j;
-                for (j = 0; j < col; j++) {
-                    if (rows[i][j])
-                        free((void *) rows[i][j]);
-                }
                 free((void *) rows[i]);
             }
         }
 
-        free(rows);
+        free((void *) rows);
     }
 
     free(self);
