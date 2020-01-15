@@ -26,6 +26,10 @@ In addition, we test **ksv** against Windows 10 as well.
 
 Pending.
 
+## Note
+
+We copy some utility code from [cwchentw/clibs](https://github.com/cwchentw/clibs).
+
 ## Copyright
 
 Copyright (c) 2020 Michael Chen. Licensed under MIT.
