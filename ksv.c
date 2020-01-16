@@ -50,12 +50,15 @@ ksv_t * ksv_new(char *delimeter, char *end_of_line, char quote)
 
     csv->row = 0;
     csv->col = 0;
-    csv->size_header = 0;
-    csv->capacity_header = 16;
-    csv->size_rows = 0;
-    csv->capacity_rows = 64;
 
-    csv->header = NULL;
+    csv->size_header = 0;
+    csv->capacity_header = 16;  /* Arbitrary header width. */
+
+    csv->size_rows = 0;
+    csv->capacity_rows = 64;  /* Arbitrary content width. */
+
+    csv->header = NULL;  /* CSV sheet may be header-less. */
+
     csv->rows = (char **) malloc(csv->capacity_rows * sizeof(char *));
     if (!(csv->rows)) {
         PUTERR("Failed to allocate rows for csv object");
