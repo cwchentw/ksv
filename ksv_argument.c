@@ -6,6 +6,7 @@
 #include "print.h"
 
 struct ksv_argument_t {
+    char *path;
     KSV_COMMAND_TYPE command;
 };
 
@@ -32,6 +33,13 @@ ksv_argument_t * ksv_argument_parse(int argc, char *argv[])
                 arg->command = KSV_COMMAND_HELP;
                 break;
             }
+            else if (0 == strcmp("show", argv[i])) {
+                arg->command = KSV_COMMAND_SHOW;
+            }
+            else {
+                arg->path = argv[i];
+                break;
+            }
         }
     }
 
@@ -50,6 +58,7 @@ static ksv_argument_t * ksv_argument_new(void)
         return arg;
     }
 
+    arg->path = NULL;
     arg->command = KSV_COMMAND_UNKNOWN;
 
     return arg;
@@ -67,4 +76,11 @@ KSV_COMMAND_TYPE ksv_argument_command(ksv_argument_t *self)
     assert(self);
 
     return self->command;
+}
+
+char * ksv_argument_path(ksv_argument_t *self)
+{
+    assert(self);
+
+    return self->path;
 }

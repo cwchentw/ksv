@@ -14,7 +14,8 @@ struct ksv_t {
     size_t index_header;
     size_t size_rows;
     size_t capacity_rows;
-    size_t index_rows;
+    size_t index_col;
+    size_t index_row;
     char **header;
     char **rows;
     char *delimeter;
@@ -59,7 +60,8 @@ ksv_t * ksv_new(char *delimeter, char *end_of_line, char quote)
 
     csv->size_rows = 0;
     csv->capacity_rows = 64;  /* Arbitrary content width. */
-    csv->index_rows = 0;
+    csv->index_col = 0;
+    csv->index_row = 0;
 
     csv->header = NULL;  /* CSV sheet may be header-less. */
 
@@ -129,6 +131,59 @@ size_t ksv_col(ksv_t *self)
     assert(self);
 
     return self->col;
+}
+
+void ksv_restart(ksv_t *self)
+{
+    assert(self);
+
+    self->index_header = 0;
+    self->index_col = 0;
+    self->index_row = 0;
+}
+
+char * ksv_next_header(ksv_t *self)
+{
+    assert(self);
+
+    if (!(self->header))
+        return NULL;
+
+    if (self->index_header >= self->size_header)
+        return NULL;
+
+    char *header = self->header[self->index_header];
+    self->index_header += 1;
+
+    return header;
+}
+
+BOOL ksv_next_column(ksv_t *self)
+{
+    assert(self);
+
+    if (self->index_col * self->row + self->index_row >= self->size_rows)
+        return FALSE;
+
+    self->index_col += 1;
+    self->index_row = 0;
+
+    return TRUE;
+}
+
+char * ksv_next_data_by_column(ksv_t *self)
+{
+    assert(self);
+
+    if (self->index_row >= self->row)
+        return NULL;
+
+    size_t index = self->index_col * self->row + self->index_row;
+    char *field =  self->rows[index];
+
+    self->index_row += 1;
+
+    return field;
 }
 
 static KSV_STATUS ksv_header_push(ksv_t *self, char *field);

@@ -8,5 +8,6 @@ typedef struct ksv_argument_t ksv_argument_t;
 ksv_argument_t * ksv_argument_parse(int argc, char *argv[]);
 void ksv_argument_delete(void *self);
 KSV_COMMAND_TYPE ksv_argument_command(ksv_argument_t *self);
+char * ksv_argument_path(ksv_argument_t *self);
 
 #endif  /* KSV_ARGUMENT_H */

@@ -81,35 +81,25 @@ KSV_STATUS ksv_parser_parse(ksv_parser_t *self, ksv_lexer_t *lexer)
             if (!ast)
                 return KSV_NO_MEMORY;
 
-            /* Consume starting quote. */
-            KSV_STATUS s = ksv_ast_add_token(ast, token);
-            if (KSV_SUCCESS != s)
-                return s;
+            /* Pass. */
 
+            /* Consume next token. */
             token = ksv_lexer_next(lexer);
             while (token) {
                 if (token && KSV_TOKEN_QUOTE == ksv_token_type(token)) {
-                    /* Consume the quote. */
-                    if (token) {
-                        s = ksv_ast_add_token(ast, token);
-                        if (KSV_SUCCESS != s)
-                            return s;
-                    }
+                    /* Pass. */
 
+                    /* Consume next token. */
                     token = ksv_lexer_next(lexer);
+
                     if (token && KSV_TOKEN_QUOTE == ksv_token_type(token)) {
-                        /* Consume escaped quote. */
-                        if (token) {
-                            s = ksv_ast_add_token(ast, token);
-                            if (KSV_SUCCESS != s)
-                                return s;
-                        }
+                        /* Pass. */
 
                         /* Keep consuming quoted string. */
                         token = ksv_lexer_next(lexer);
                     }
                     else {
-                        s = ksv_parser_push(self, ast);
+                        KSV_STATUS s = ksv_parser_push(self, ast);
                         if (KSV_SUCCESS != s)
                             return s;
 
@@ -129,7 +119,7 @@ KSV_STATUS ksv_parser_parse(ksv_parser_t *self, ksv_lexer_t *lexer)
                 else {
                     /* Consume a token greedily. */
                     if (token) {
-                        s = ksv_ast_add_token(ast, token);
+                        KSV_STATUS s = ksv_ast_add_token(ast, token);
                         if (KSV_SUCCESS != s)
                             return s;
                     }
