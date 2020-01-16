@@ -21,7 +21,7 @@ struct ksv_t {
     char **rows;
     char *delimeter;
     char *end_of_line;
-    char quote;
+    char *quote;
 };
 
 ksv_t * ksv_new_default(void)
@@ -36,14 +36,14 @@ ksv_t * ksv_new_default(void)
     #endif
 #endif  /* END_OF_LINE */
 
-    return ksv_new(",", END_OF_LINE, '"');
+    return ksv_new(",", END_OF_LINE, "\"");
 }
 
-ksv_t * ksv_new(char *delimeter, char *end_of_line, char quote)
+ksv_t * ksv_new(char *delimeter, char *end_of_line, char *quote)
 {
-    assert(0 != strcmp("", delimeter));
-    assert(0 != strcmp("", end_of_line));
-    assert(quote);
+    assert(delimeter && 0 != strcmp("", delimeter));
+    assert(end_of_line && 0 != strcmp("", end_of_line));
+    assert(quote && 0 != strcmp("", quote));
 
     ksv_t *csv = (ksv_t *) malloc(sizeof(ksv_t));
     if (!csv) {

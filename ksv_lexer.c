@@ -9,14 +9,14 @@
 struct ksv_lexer_t {
     char *delimeter;
     char *end_of_line;
-    char quote;
+    char *quote;
     size_t size;
     size_t capacity;
     size_t index;
     ksv_token_t **tokens;
 };
 
-ksv_lexer_t * ksv_lexer_new(char *delimeter, char *end_of_line, char quote)
+ksv_lexer_t * ksv_lexer_new(char *delimeter, char *end_of_line, char *quote)
 {
     ksv_lexer_t *lexer = (ksv_lexer_t *) malloc(sizeof(ksv_lexer_t));
     if (!lexer) {
@@ -138,8 +138,13 @@ KSV_STATUS ksv_lexer_lex(ksv_lexer_t *self, char *input)
                     goto LEX_STRING;
                 }
             }
-            else if (self->quote == input[i]) {
-                char *quote = string_allocate_char(self->quote);
+            else if (self->quote[0] == input[i]) {
+                for (j = 0; j < strlen(self->quote) && i+j < strlen(input); j++) {
+                    if (self->quote[j] != input[i+j])
+                        goto LEX_STRING;
+                }
+
+                char *quote = string_allocate(self->quote);
                 if (!quote)
                     return KSV_NO_MEMORY;
 
@@ -184,9 +189,6 @@ KSV_STATUS ksv_lexer_lex(ksv_lexer_t *self, char *input)
             else {
             LEX_STRING:
                 for (j = i; j < strlen(input); j++) {
-                    if (self->quote == input[j])
-                        break;
-
                     if (0 == strcmp("\n", self->end_of_line) && '\n' == input[j])
                         break;
 
@@ -197,6 +199,19 @@ KSV_STATUS ksv_lexer_lex(ksv_lexer_t *self, char *input)
                         break;
 
                     size_t k;
+                    BOOL is_quote = TRUE;
+                    for (k = 0; k < strlen(self->quote) && j+k < strlen(input); k++) {
+                        if (self->quote[k] != input[j+k]) {
+                            is_quote = FALSE;
+                            break;
+                        }
+                    }
+
+                    if (is_quote) {
+                        j += k - 1;
+                        break;
+                    }
+
                     BOOL is_delim = TRUE;
                     for (k = 0; k < strlen(self->delimeter) && j+k < strlen(input); k++) {
                         if (self->delimeter[k] != input[j+k]) {

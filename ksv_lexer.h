@@ -6,7 +6,7 @@
 
 typedef struct ksv_lexer_t ksv_lexer_t;
 
-ksv_lexer_t * ksv_lexer_new(char *delimeter, char *end_of_line, char quote);
+ksv_lexer_t * ksv_lexer_new(char *delimeter, char *end_of_line, char *quote);
 void ksv_lexer_delete(void *self);
 KSV_STATUS ksv_lexer_lex(ksv_lexer_t *self, char *input);
 void ksv_lexer_start(ksv_lexer_t *self);
