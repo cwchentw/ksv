@@ -80,7 +80,41 @@ ksv_t * ksv_new(char *delimeter, char *end_of_line, char quote)
     return csv;
 }
 
+void ksv_delete(void *self)
+{
+    assert(self);
+
+    size_t row = ((ksv_t *) self)->row;
+    size_t col = ((ksv_t *) self)->col;
+
+    char **header = ((ksv_t *) self)->header;
+    if (header) {
+        size_t i;
+        for (i = 0; i < col; i++) {
+            if (header[i])
+                free((void *) header[i]);
+        }
+
+        free((void *) header);
+    }
+
+    char **rows = ((ksv_t *) self)->rows;
+    if (rows) {
+        size_t i;
+        for (i = 0; i < col * row; i++) {
+            if (rows[i]) {
+                free((void *) rows[i]);
+            }
+        }
+
+        free((void *) rows);
+    }
+
+    free(self);
+}
+
 static BOOL ksv_header_push(ksv_t *self, char *field);
+static BOOL ksv_rows_push(ksv_t *self, char *field);
 
 BOOL ksv_load_stream_with_header_strictly(ksv_t *self, FILE *stream)
 {
@@ -176,7 +210,36 @@ BOOL ksv_load_stream_with_header_strictly(ksv_t *self, FILE *stream)
                 visited = TRUE;
             }
             else {
-                /* Parse csv row. */
+                ksv_ast_t *ast = ksv_parser_next(parser);
+                char *field = NULL;
+                while (ast) {
+                    switch (ksv_ast_type(ast)) {
+                    case KSV_AST_FIELD:
+                        field = ksv_ast_string(ast);
+                        if (!field)
+                            goto ERROR_CSV;
+
+                        if (!ksv_rows_push(self, field))
+                            goto ERROR_CSV;
+
+                        break;
+                    case KSV_AST_DELIMITER:
+                        break;
+                    case KSV_AST_EOL:
+                        goto END_CSV_ROW;
+                    default:
+                        assert(0 && "Unknown ksv ast");
+                    }
+
+                    ast = ksv_parser_next(parser);
+                }
+            END_CSV_ROW:
+                if (0 != self->size_rows % self->col) {
+                    PUTERR("Wrong CSV width");
+                    goto ERROR_CSV;
+                }
+
+                self->row += 1;
             }
 
             ksv_lexer_delete(lexer);
@@ -254,35 +317,52 @@ static BOOL ksv_header_expand(ksv_t *self)
     return TRUE;
 }
 
-void ksv_delete(void *self)
+static BOOL ksv_rows_expand(ksv_t *self);
+
+static BOOL ksv_rows_push(ksv_t *self, char *field)
 {
     assert(self);
 
-    size_t row = ((ksv_t *) self)->row;
-    size_t col = ((ksv_t *) self)->col;
+    if (!ksv_rows_expand(self))
+        return FALSE;
 
-    char **header = ((ksv_t *) self)->header;
-    if (header) {
-        size_t i;
-        for (i = 0; i < col; i++) {
-            if (header[i])
-                free((void *) header[i]);
-        }
+    self->rows[self->size_rows] = field;
+    self->size_rows += 1;
 
-        free((void *) header);
+    return TRUE;
+}
+
+static BOOL ksv_rows_expand(ksv_t *self)
+{
+    assert(self);
+
+    if (self->size_rows < self->capacity_rows)
+        return TRUE;
+
+    self->capacity_rows <<= 1;
+    char **old_rows = self->rows;
+    char **new_rows = \
+        (char **) malloc(self->capacity_rows * sizeof(char *));
+    if (!new_rows) {
+        PUTERR("Failed to allocate memory for rows of csv object");
+        PUTERR("Check available system memory");
+        return FALSE;
     }
 
-    char **rows = ((ksv_t *) self)->rows;
-    if (rows) {
+    {
         size_t i;
-        for (i = 0; i < row; i++) {
-            if (rows[i]) {
-                free((void *) rows[i]);
-            }
-        }
-
-        free((void *) rows);
+        for (i = 0; i < self->size_rows; ++i)
+            new_rows[i] = old_rows[i];
     }
 
-    free(self);
+    {
+        size_t i;
+        for (i = self->size_rows; i < self->capacity_rows; ++i)
+            new_rows[i] = NULL;
+    }
+
+    self->rows = new_rows;
+    free(old_rows);
+
+    return TRUE;
 }
