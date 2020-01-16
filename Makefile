@@ -54,11 +54,11 @@ endif
 ifneq (,$(findstring $(CC),$(CL)))
 	OBJS=cstring.obj ksv_token.obj ksv_lexer.obj \
 		ksv_ast.obj ksv_parser.obj ksv.obj
-	EXEC_OBJS=ksv_cli.obj
+	EXEC_OBJS=ksv_argument.obj ksv_cli.obj
 else
 	OBJS=cstring.o ksv_token.o ksv_lexer.o \
 		ksv_ast.o ksv_parser.o ksv.o
-	EXEC_OBJS=ksv_cli.o
+	EXEC_OBJS=ksv_argument.o ksv_cli.o
 endif
 
 

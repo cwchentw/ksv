@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "ksv.h"
+#include "ksv_argument.h"
 #include "print.h"
 
 int main(int argc, char *argv[])
@@ -9,8 +10,15 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    ksv_argument_t *arg;
     FILE *fp = NULL;
     ksv_t *ksv = NULL;
+
+    arg = ksv_argument_parse(argc, argv);
+    if (!arg) {
+        PUTERR("Failed to parse command line arguments");
+        return 1;
+    }
 
     /* Refactor it later. */
     const char *path = argv[1];
@@ -37,6 +45,7 @@ int main(int argc, char *argv[])
 
     ksv_delete(ksv);
     fclose(fp);
+    ksv_argument_delete(arg);
 
     return 0;
 
@@ -46,6 +55,9 @@ ERROR_KSV:
 
     if (fp)
         fclose(fp);
+
+    if (arg)
+        ksv_argument_delete(arg);
 
     return 1;
 }
