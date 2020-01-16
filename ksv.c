@@ -52,7 +52,7 @@ ksv_t * ksv_new(char *delimeter, char *end_of_line, char quote)
     csv->col = 0;
 
     csv->size_header = 0;
-    csv->capacity_header = 16;  /* Arbitrary header width. */
+    csv->capacity_header = 8;  /* Arbitrary header width. */
 
     csv->size_rows = 0;
     csv->capacity_rows = 64;  /* Arbitrary content width. */
