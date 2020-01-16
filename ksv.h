@@ -32,6 +32,7 @@ ksv_t * ksv_new_default(void);
 ksv_t * ksv_new(char *delimeter, char *end_of_line, char quote);
 void ksv_delete(void *self);
 KSV_STATUS ksv_load_stream_with_header_strictly(ksv_t *self, FILE *stream);
+BOOL ksv_has_header(ksv_t *self);
 size_t ksv_row(ksv_t *self);
 size_t ksv_col(ksv_t *self);
 void ksv_restart(ksv_t *self);

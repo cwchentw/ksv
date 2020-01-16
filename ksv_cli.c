@@ -117,8 +117,10 @@ KSV_STATUS show_sheet(FILE *stream, ksv_t *ksv)
         while (is_column_valid) {
             size_t sz = 0;
 
-            char *header = ksv_next_header(ksv);
-            sz = sz > strlen(header) ? sz : strlen(header);
+            if (ksv_has_header(ksv)) {
+                char *header = ksv_next_header(ksv);
+                sz = sz > strlen(header) ? sz : strlen(header);
+            }            
 
             char *field = ksv_next_data_by_column(ksv);
         #if DEBUG
@@ -167,8 +169,8 @@ KSV_STATUS show_sheet(FILE *stream, ksv_t *ksv)
 
     line[0] = '\0';
 
-    /* Print top horizontal line */
-    {
+    /* Print horizontal line if sheet header exists. */
+    if (ksv_has_header(ksv)) {
         size_t i;
         for (i = 0; i < total; ++i)
             line[i] = '-';
@@ -179,15 +181,16 @@ KSV_STATUS show_sheet(FILE *stream, ksv_t *ksv)
             line[temp+ss[i]] = '+';
             temp += ss[i]+1;
         }
+
+        line[total] = '\0';
+
+        fprintf(stream, "%s%s", line, END_OF_LINE);
+
+        line[0] = '\0';
     }
-    line[total] = '\0';
 
-    fprintf(stream, "%s%s", line, END_OF_LINE);
-
-    line[0] = '\0';
-
-    /* Print header. */
-    {
+    /* Print header if it exists. */
+    if (ksv_has_header(ksv)) {
         ksv_restart(ksv);
 
         line[0] = '|';  /* First vertial line. */
@@ -219,12 +222,13 @@ KSV_STATUS show_sheet(FILE *stream, ksv_t *ksv)
                 temp += sz + 1;
             }
         }
+
+        line[total] = '\0';
+
+        fprintf(stream, "%s%s", line, END_OF_LINE);
+
+        line[0] = '\0';
     }
-    line[total] = '\0';
-
-    fprintf(stream, "%s%s", line, END_OF_LINE);
-
-    line[0] = '\0';
 
     /* Print horizontal line */
     {

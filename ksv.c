@@ -120,6 +120,13 @@ void ksv_delete(void *self)
     free(self);
 }
 
+BOOL ksv_has_header(ksv_t *self)
+{
+    assert(self);
+
+    return self->header ? TRUE : FALSE;
+}
+
 size_t ksv_row(ksv_t *self)
 {
     assert(self);
