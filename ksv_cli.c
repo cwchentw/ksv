@@ -58,6 +58,10 @@ int main(int argc, char *argv[])
     if (KSV_SUCCESS != ksv_load_stream_with_header_strictly(ksv, fp))
         goto ERROR_KSV;
 
+#if DEBUG
+    PUTERR("CSV dimension (col, row): (%lu, %lu)", ksv_col(ksv), ksv_row(ksv));
+#endif
+
 END_CSV:
     if (ksv)
         ksv_delete(ksv);

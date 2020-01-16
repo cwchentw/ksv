@@ -11,8 +11,10 @@ struct ksv_t {
     size_t col;
     size_t size_header;
     size_t capacity_header;
+    size_t index_header;
     size_t size_rows;
     size_t capacity_rows;
+    size_t index_rows;
     char **header;
     char **rows;
     char *delimeter;
@@ -53,9 +55,11 @@ ksv_t * ksv_new(char *delimeter, char *end_of_line, char quote)
 
     csv->size_header = 0;
     csv->capacity_header = 8;  /* Arbitrary header width. */
+    csv->index_header = 0;
 
     csv->size_rows = 0;
     csv->capacity_rows = 64;  /* Arbitrary content width. */
+    csv->index_rows = 0;
 
     csv->header = NULL;  /* CSV sheet may be header-less. */
 
@@ -111,6 +115,20 @@ void ksv_delete(void *self)
     }
 
     free(self);
+}
+
+size_t ksv_row(ksv_t *self)
+{
+    assert(self);
+
+    return self->row;
+}
+
+size_t ksv_col(ksv_t *self)
+{
+    assert(self);
+
+    return self->col;
 }
 
 static KSV_STATUS ksv_header_push(ksv_t *self, char *field);
@@ -216,8 +234,10 @@ KSV_STATUS ksv_load_stream_with_header_strictly(ksv_t *self, FILE *stream)
                         self->col += 1;
                         break;
                     case KSV_AST_DELIMITER:
+                        /* Pass. */
                         break;
                     case KSV_AST_EOL:
+                        /* Stop reading CSV row. */
                         goto END_CSV_HEADER;
                     default:
                         assert(0 && "Unknown ksv ast");
@@ -246,8 +266,10 @@ KSV_STATUS ksv_load_stream_with_header_strictly(ksv_t *self, FILE *stream)
 
                         break;
                     case KSV_AST_DELIMITER:
+                        /* Pass. */
                         break;
                     case KSV_AST_EOL:
+                        /* Stop reading CSV row. */
                         goto END_CSV_ROW;
                     default:
                         assert(0 && "Unknown ksv ast");
