@@ -404,6 +404,13 @@ static char * ksv_ast_delimiter_string(ksv_ast_delimiter_t *self)
     return string_allocate(ksv_token_string(self->token));
 }
 
+KSV_AST_TYPE ksv_ast_type(ksv_ast_t *self)
+{
+    assert(self);
+
+    return self->type;
+}
+
 static char * ksv_ast_eol_string(ksv_ast_eol_t *self)
 {
     assert(self);

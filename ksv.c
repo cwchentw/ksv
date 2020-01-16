@@ -9,7 +9,10 @@
 struct ksv_t {
     size_t row;
     size_t col;
-    size_t capacity;
+    size_t size_header;
+    size_t capacity_header;
+    size_t size_rows;
+    size_t capacity_rows;
     char **header;
     char **rows;
     char *delimeter;
@@ -47,10 +50,13 @@ ksv_t * ksv_new(char *delimeter, char *end_of_line, char quote)
 
     csv->row = 0;
     csv->col = 0;
-    csv->capacity = 16;
+    csv->size_header = 0;
+    csv->capacity_header = 16;
+    csv->size_rows = 0;
+    csv->capacity_rows = 64;
 
     csv->header = NULL;
-    csv->rows = (char **) malloc(csv->capacity * sizeof(char *));
+    csv->rows = (char **) malloc(csv->capacity_rows * sizeof(char *));
     if (!(csv->rows)) {
         PUTERR("Failed to allocate rows for csv object");
         PUTERR("Check available system memory");
@@ -60,7 +66,7 @@ ksv_t * ksv_new(char *delimeter, char *end_of_line, char quote)
 
     {
         size_t i;
-        for (i = 0; i < csv->capacity; i++)
+        for (i = 0; i < csv->capacity_rows; i++)
             csv->rows[i] = NULL;
     }
 
@@ -70,6 +76,8 @@ ksv_t * ksv_new(char *delimeter, char *end_of_line, char quote)
 
     return csv;
 }
+
+static BOOL ksv_header_push(ksv_t *self, char *field);
 
 BOOL ksv_load_stream_with_header_strictly(ksv_t *self, FILE *stream)
 {
@@ -123,7 +131,46 @@ BOOL ksv_load_stream_with_header_strictly(ksv_t *self, FILE *stream)
                 goto ERROR_CSV;
 
             if (!visited) {
-                /* Parse csv header. */
+                self->header = \
+                    (char **) malloc(self->capacity_header * sizeof(char *));
+                if (!(self->header)) {
+                    PUTERR("Failed to allocate header for csv object");
+                    PUTERR("Check available system memory");
+                    goto ERROR_CSV;
+                }
+
+                {
+                    size_t i;
+                    for (i = 0; i < self->capacity_header; ++i)
+                        self->header[i] = NULL;
+                }
+
+                ksv_ast_t *ast = ksv_parser_next(parser);
+                char *field = NULL;
+                while (ast) {
+                    switch (ksv_ast_type(ast)) {
+                    case KSV_AST_FIELD:
+                        field = ksv_ast_string(ast);
+                        if (!field)
+                            goto ERROR_CSV;
+
+                        if (!ksv_header_push(self, field))
+                            goto ERROR_CSV;
+
+                        self->col += 1;
+                        break;
+                    case KSV_AST_DELIMITER:
+                        break;
+                    case KSV_AST_EOL:
+                        goto END_CSV_HEADER;
+                    default:
+                        assert(0 && "Unknown ksv ast");
+                    }
+
+                    ast = ksv_parser_next(parser);
+                }
+            END_CSV_HEADER:
+                visited = TRUE;
             }
             else {
                 /* Parse csv row. */
@@ -154,6 +201,56 @@ ERROR_CSV:
     return FALSE;
 }
 
+static BOOL ksv_header_expand(ksv_t *self);
+
+static BOOL ksv_header_push(ksv_t *self, char *field)
+{
+    assert(self);
+
+    if (!ksv_header_expand(self))
+        return FALSE;
+
+    self->header[self->size_header] = field;
+    self->size_header += 1;
+
+    return TRUE;
+}
+
+static BOOL ksv_header_expand(ksv_t *self)
+{
+    assert(self);
+
+    if (self->size_header < self->capacity_header)
+        return TRUE;
+
+    self->capacity_header <<= 1;
+    char **old_header = self->header;
+    char **new_header = \
+        (char **) malloc(self->capacity_header * sizeof(char *));
+    if (!new_header) {
+        PUTERR("Failed to reallocate memory for header of csv object");
+        PUTERR("Check available system memory");
+        return FALSE;
+    }
+
+    {
+        size_t i;
+        for (i = 0; i < self->size_header; i++)
+            new_header[i] = old_header[i];
+    }
+
+    {
+        size_t i;
+        for (i = self->size_header; i < self->capacity_header; i++)
+            new_header[i] = NULL;
+    }
+
+    self->header = new_header;
+    free(old_header);
+
+    return TRUE;
+}
+
 void ksv_delete(void *self)
 {
     assert(self);
@@ -169,7 +266,7 @@ void ksv_delete(void *self)
                 free((void *) header[i]);
         }
 
-        free(header);
+        free((void *) header);
     }
 
     char **rows = ((ksv_t *) self)->rows;

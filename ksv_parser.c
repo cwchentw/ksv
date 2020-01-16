@@ -8,6 +8,7 @@
 struct ksv_parser_t {
     size_t size;
     size_t capacity;
+    size_t index;
     ksv_ast_t **asts;
 };
 
@@ -23,6 +24,7 @@ ksv_parser_t * ksv_parser_new(void)
 
     parser->size = 0;
     parser->capacity = 16;
+    parser->index = 0;
 
     parser->asts = \
         (ksv_ast_t **) malloc(parser->capacity * sizeof(ksv_ast_t *));
@@ -260,4 +262,17 @@ static BOOL ksv_parser_expand(ksv_parser_t *self)
     free(old_asts);
 
     return TRUE;
+}
+
+ksv_ast_t * ksv_parser_next(ksv_parser_t *self)
+{
+    assert(self);
+
+    if (self->index > self->size - 1)
+        return NULL;
+
+    ksv_ast_t *ast = self->asts[self->index];
+    self->index += 1;
+
+    return ast;
 }
