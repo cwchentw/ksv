@@ -22,4 +22,5 @@ void ksv_help(FILE *stream)
     fprintf(stream, "    version\tShow version info and exit%s", END_OF_LINE);
     fprintf(stream, "    license\tShow license info and exit%s", END_OF_LINE);
     fprintf(stream, "    help\tShow help info and exit%s", END_OF_LINE);
+    fprintf(stream, "    show\tShow CSV sheet as table in console%s", END_OF_LINE);
 }
