@@ -13,7 +13,7 @@ typedef unsigned char KSV_AST_TYPE;
 
 ksv_ast_t * ksv_ast_new(KSV_AST_TYPE type);
 void ksv_ast_delete(void *self);
-BOOL ksv_ast_add_token(ksv_ast_t *self, ksv_token_t *token);
+KSV_STATUS ksv_ast_add_token(ksv_ast_t *self, ksv_token_t *token);
 KSV_AST_TYPE ksv_ast_type(ksv_ast_t *self);
 char * ksv_ast_string(ksv_ast_t *self);
 

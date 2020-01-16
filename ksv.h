@@ -13,6 +13,15 @@
     #include "boolean.h"
 #endif
 
+typedef unsigned char KSV_STATUS;
+
+#define  KSV_SUCCESS        0
+#define  KSV_FAILURE        1
+#define  KSV_NO_MEMORY      2
+#define  KSV_ERROR_LEXING   3
+#define  KSV_ERROR_PARSING  4
+#define  KSV_INVALID_FILE   5
+
 typedef struct ksv_t ksv_t;
 
 #ifdef __cplusplus
@@ -22,7 +31,7 @@ extern "C" {
 ksv_t * ksv_new_default(void);
 ksv_t * ksv_new(char *delimeter, char *end_of_line, char quote);
 void ksv_delete(void *self);
-BOOL ksv_load_stream_with_header_strictly(ksv_t *self, FILE *stream);
+KSV_STATUS ksv_load_stream_with_header_strictly(ksv_t *self, FILE *stream);
 
 #ifdef __cplusplus
 }

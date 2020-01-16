@@ -113,10 +113,10 @@ void ksv_delete(void *self)
     free(self);
 }
 
-static BOOL ksv_header_push(ksv_t *self, char *field);
-static BOOL ksv_rows_push(ksv_t *self, char *field);
+static KSV_STATUS ksv_header_push(ksv_t *self, char *field);
+static KSV_STATUS ksv_rows_push(ksv_t *self, char *field);
 
-BOOL ksv_load_stream_with_header_strictly(ksv_t *self, FILE *stream)
+KSV_STATUS ksv_load_stream_with_header_strictly(ksv_t *self, FILE *stream)
 {
     assert(self);
 
@@ -127,20 +127,26 @@ BOOL ksv_load_stream_with_header_strictly(ksv_t *self, FILE *stream)
     size_t line_width = 150;  /* Sensible initial line width. */
     line = (char *) malloc(line_width * sizeof(char));
     if (!line) {
+    #if DEBUG
         PUTERR("Failed to allocate memory for C string");
         PUTERR("Check available system memory");
-        return FALSE;
+    #endif
+        return KSV_NO_MEMORY;
     }
 
+    KSV_STATUS ksv_status = KSV_FAILURE;
     BOOL visited = FALSE;
     while (fgets(line, line_width, stream)) {
         if (line_width == strlen(line)) {
             if ('\n' != line[line_width-1]) {
                 line_width <<= 1;
                 if (!realloc(line, line_width)) {
+                #if DEBUG
                     PUTERR("Failed to realloc memory for C string");
                     PUTERR("Check available system memory");
-                    return FALSE;
+                #endif
+                    ksv_status = KSV_NO_MEMORY;
+                    goto ERROR_CSV;
                 }
             }
             else {
@@ -154,25 +160,34 @@ BOOL ksv_load_stream_with_header_strictly(ksv_t *self, FILE *stream)
                 self->end_of_line,
                 self->quote
             );
-            if (!lexer)
+            if (!lexer) {
+                ksv_status = KSV_NO_MEMORY;
                 goto ERROR_CSV;
+            }
 
             parser = ksv_parser_new();
-            if (!parser)
+            if (!parser) {
+                ksv_status = KSV_NO_MEMORY;
+                goto ERROR_CSV;
+            }
+
+            ksv_status = ksv_lexer_lex(lexer, line);
+            if (KSV_SUCCESS != ksv_status)
                 goto ERROR_CSV;
 
-            if (!ksv_lexer_lex(lexer, line))
-                goto ERROR_CSV;
-
-            if (!ksv_parser_parse(parser, lexer))
+            ksv_status = ksv_parser_parse(parser, lexer);
+            if (KSV_SUCCESS != ksv_status)
                 goto ERROR_CSV;
 
             if (!visited) {
                 self->header = \
                     (char **) malloc(self->capacity_header * sizeof(char *));
                 if (!(self->header)) {
+                #if DEBUG
                     PUTERR("Failed to allocate header for csv object");
                     PUTERR("Check available system memory");
+                #endif
+                    ksv_status = KSV_NO_MEMORY;
                     goto ERROR_CSV;
                 }
 
@@ -188,11 +203,15 @@ BOOL ksv_load_stream_with_header_strictly(ksv_t *self, FILE *stream)
                     switch (ksv_ast_type(ast)) {
                     case KSV_AST_FIELD:
                         field = ksv_ast_string(ast);
-                        if (!field)
+                        if (!field) {
+                            ksv_status = KSV_NO_MEMORY;
                             goto ERROR_CSV;
+                        }
 
-                        if (!ksv_header_push(self, field))
+                        ksv_status = ksv_header_push(self, field);
+                        if (KSV_SUCCESS != ksv_status) {
                             goto ERROR_CSV;
+                        }
 
                         self->col += 1;
                         break;
@@ -216,10 +235,13 @@ BOOL ksv_load_stream_with_header_strictly(ksv_t *self, FILE *stream)
                     switch (ksv_ast_type(ast)) {
                     case KSV_AST_FIELD:
                         field = ksv_ast_string(ast);
-                        if (!field)
+                        if (!field) {
+                            ksv_status = KSV_NO_MEMORY;
                             goto ERROR_CSV;
+                        }
 
-                        if (!ksv_rows_push(self, field))
+                        ksv_status = ksv_rows_push(self, field);
+                        if (KSV_SUCCESS != ksv_status)
                             goto ERROR_CSV;
 
                         break;
@@ -235,7 +257,7 @@ BOOL ksv_load_stream_with_header_strictly(ksv_t *self, FILE *stream)
                 }
             END_CSV_ROW:
                 if (0 != self->size_rows % self->col) {
-                    PUTERR("Wrong CSV width");
+                    ksv_status = KSV_INVALID_FILE;
                     goto ERROR_CSV;
                 }
 
@@ -252,7 +274,7 @@ BOOL ksv_load_stream_with_header_strictly(ksv_t *self, FILE *stream)
 
     free(line);
 
-    return TRUE;
+    return KSV_SUCCESS;
 
 ERROR_CSV:
     if (parser)
@@ -264,39 +286,42 @@ ERROR_CSV:
     if (line)
         free(line);
 
-    return FALSE;
+    return ksv_status;
 }
 
-static BOOL ksv_header_expand(ksv_t *self);
+static KSV_STATUS ksv_header_expand(ksv_t *self);
 
-static BOOL ksv_header_push(ksv_t *self, char *field)
+static KSV_STATUS ksv_header_push(ksv_t *self, char *field)
 {
     assert(self);
 
-    if (!ksv_header_expand(self))
-        return FALSE;
+    KSV_STATUS s = ksv_header_expand(self);
+    if (KSV_SUCCESS != s)
+        return s;
 
     self->header[self->size_header] = field;
     self->size_header += 1;
 
-    return TRUE;
+    return KSV_SUCCESS;
 }
 
-static BOOL ksv_header_expand(ksv_t *self)
+static KSV_STATUS ksv_header_expand(ksv_t *self)
 {
     assert(self);
 
     if (self->size_header < self->capacity_header)
-        return TRUE;
+        return KSV_SUCCESS;
 
     self->capacity_header <<= 1;
     char **old_header = self->header;
     char **new_header = \
         (char **) malloc(self->capacity_header * sizeof(char *));
     if (!new_header) {
+    #if DEBUG
         PUTERR("Failed to reallocate memory for header of csv object");
         PUTERR("Check available system memory");
-        return FALSE;
+    #endif
+        return KSV_NO_MEMORY;
     }
 
     {
@@ -314,39 +339,42 @@ static BOOL ksv_header_expand(ksv_t *self)
     self->header = new_header;
     free(old_header);
 
-    return TRUE;
+    return KSV_SUCCESS;
 }
 
-static BOOL ksv_rows_expand(ksv_t *self);
+static KSV_STATUS ksv_rows_expand(ksv_t *self);
 
-static BOOL ksv_rows_push(ksv_t *self, char *field)
+static KSV_STATUS ksv_rows_push(ksv_t *self, char *field)
 {
     assert(self);
 
-    if (!ksv_rows_expand(self))
-        return FALSE;
+    KSV_STATUS s = ksv_rows_expand(self);
+    if (KSV_SUCCESS != s)
+        return s;
 
     self->rows[self->size_rows] = field;
     self->size_rows += 1;
 
-    return TRUE;
+    return KSV_SUCCESS;
 }
 
-static BOOL ksv_rows_expand(ksv_t *self)
+static KSV_STATUS ksv_rows_expand(ksv_t *self)
 {
     assert(self);
 
     if (self->size_rows < self->capacity_rows)
-        return TRUE;
+        return KSV_SUCCESS;
 
     self->capacity_rows <<= 1;
     char **old_rows = self->rows;
     char **new_rows = \
         (char **) malloc(self->capacity_rows * sizeof(char *));
     if (!new_rows) {
+    #if DEBUG
         PUTERR("Failed to allocate memory for rows of csv object");
         PUTERR("Check available system memory");
-        return FALSE;
+    #endif
+        return KSV_NO_MEMORY;
     }
 
     {
@@ -364,5 +392,5 @@ static BOOL ksv_rows_expand(ksv_t *self)
     self->rows = new_rows;
     free(old_rows);
 
-    return TRUE;
+    return KSV_SUCCESS;
 }

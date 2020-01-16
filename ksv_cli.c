@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
     if (!ksv)
         goto ERROR_KSV;
 
-    if (!ksv_load_stream_with_header_strictly(ksv, fp))
+    if (KSV_SUCCESS != ksv_load_stream_with_header_strictly(ksv, fp))
         goto ERROR_KSV;
 
     ksv_delete(ksv);

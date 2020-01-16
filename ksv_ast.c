@@ -218,57 +218,62 @@ static void ksv_ast_eol_delete(void *self)
     free(self);
 }
 
-static BOOL ksv_ast_field_add_token(ksv_ast_field_t *self, ksv_token_t *token);
-static BOOL ksv_ast_delimiter_add_token(ksv_ast_delimiter_t *self, ksv_token_t *token);
-static BOOL ksv_ast_eol_add_token(ksv_ast_eol_t *self, ksv_token_t *token);
+static KSV_STATUS ksv_ast_field_add_token(ksv_ast_field_t *self, ksv_token_t *token);
+static KSV_STATUS ksv_ast_delimiter_add_token(ksv_ast_delimiter_t *self, ksv_token_t *token);
+static KSV_STATUS ksv_ast_eol_add_token(ksv_ast_eol_t *self, ksv_token_t *token);
 
-BOOL ksv_ast_add_token(ksv_ast_t *self, ksv_token_t *token)
+KSV_STATUS ksv_ast_add_token(ksv_ast_t *self, ksv_token_t *token)
 {
     assert(self);
     assert(token);
 
+    KSV_STATUS status;
     switch (self->type) {
     case KSV_AST_FIELD:
-        if (!ksv_ast_field_add_token(self->ast.field, token))
-            return FALSE;
+        status = ksv_ast_field_add_token(self->ast.field, token);
+        if (KSV_SUCCESS != status)
+            return status;
         break;
     case KSV_AST_DELIMITER:
-        if (!ksv_ast_delimiter_add_token(self->ast.delimiter, token))
-            return FALSE;
+        status = ksv_ast_delimiter_add_token(self->ast.delimiter, token);
+        if (KSV_SUCCESS != status)
+            return status;
         break;
     case KSV_AST_EOL:
-        if (!ksv_ast_eol_add_token(self->ast.eol, token))
-            return FALSE;
+        status = ksv_ast_eol_add_token(self->ast.eol, token);
+        if (KSV_SUCCESS != status)
+            return status;
         break;
     default:
-        return FALSE;
+        assert(0 && "Unknown ksv ast");
     }
 
-    return TRUE;
+    return KSV_SUCCESS;
 }
 
-static BOOL ksv_ast_field_expand(ksv_ast_field_t *self);
+static KSV_STATUS ksv_ast_field_expand(ksv_ast_field_t *self);
 
-static BOOL ksv_ast_field_add_token(ksv_ast_field_t *self, ksv_token_t *token)
+static KSV_STATUS ksv_ast_field_add_token(ksv_ast_field_t *self, ksv_token_t *token)
 {
     assert(self);
     assert(token);
 
-    if (!ksv_ast_field_expand(self))
-        return FALSE;
+    KSV_STATUS s = ksv_ast_field_expand(self);
+    if (KSV_SUCCESS != s)
+        return s;
 
     self->tokens[self->size] = token;
     self->size += 1;
 
-    return TRUE;
+    return KSV_SUCCESS;
 }
 
-static BOOL ksv_ast_field_expand(ksv_ast_field_t *self)
+static KSV_STATUS ksv_ast_field_expand(ksv_ast_field_t *self)
 {
     assert(self);
 
     if (self->size + 1 <= self->capacity)
-        return TRUE;
+        return KSV_SUCCESS;
 
     self->capacity <<= 1;
     ksv_token_t **old_tokens = self->tokens;
@@ -277,7 +282,7 @@ static BOOL ksv_ast_field_expand(ksv_ast_field_t *self)
     if (!new_tokens) {
         PUTERR("Failed to allocate the tokens of ksv field ast");
         PUTERR("Check available system memory");
-        return FALSE;
+        return KSV_NO_MEMORY;
     }
 
     {
@@ -295,35 +300,35 @@ static BOOL ksv_ast_field_expand(ksv_ast_field_t *self)
     self->tokens = new_tokens;
     free(old_tokens);
 
-    return TRUE;
+    return KSV_SUCCESS;
 }
 
-static BOOL ksv_ast_delimiter_add_token(ksv_ast_delimiter_t *self, ksv_token_t *token)
+static KSV_STATUS ksv_ast_delimiter_add_token(ksv_ast_delimiter_t *self, ksv_token_t *token)
 {
     assert(self);
     assert(token);
 
     if (self->size > 0)
-        return FALSE;
+        return KSV_ERROR_PARSING;
 
     self->token = token;
     self->size += 1;
 
-    return TRUE;
+    return KSV_SUCCESS;
 }
 
-static BOOL ksv_ast_eol_add_token(ksv_ast_eol_t *self, ksv_token_t *token)
+static KSV_STATUS ksv_ast_eol_add_token(ksv_ast_eol_t *self, ksv_token_t *token)
 {
     assert(self);
     assert(token);
 
     if (self->size > 0)
-        return FALSE;
+        return KSV_ERROR_PARSING;
 
     self->token = token;
     self->size += 1;
 
-    return TRUE;
+    return KSV_SUCCESS;
 }
 
 static char * ksv_ast_field_string(ksv_ast_field_t *self);

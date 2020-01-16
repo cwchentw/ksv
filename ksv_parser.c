@@ -17,8 +17,10 @@ ksv_parser_t * ksv_parser_new(void)
     ksv_parser_t *parser = \
         (ksv_parser_t *) malloc(sizeof(ksv_parser_t));
     if (!parser) {
+    #if DEBUG
         PUTERR("Failed to allocate memory for ksv parser");
         PUTERR("Check available system memory");
+    #endif
         return parser;
     }
 
@@ -29,8 +31,10 @@ ksv_parser_t * ksv_parser_new(void)
     parser->asts = \
         (ksv_ast_t **) malloc(parser->capacity * sizeof(ksv_ast_t *));
     if (!(parser->asts)) {
+    #if DEBUG
         PUTERR("Failed to allocate memory for the asts of ksv parser");
         PUTERR("Check available system memory");
+    #endif
         free(parser);
         return NULL;
     }
@@ -63,9 +67,9 @@ void ksv_parser_delete(void *self)
     free(self);
 }
 
-static BOOL ksv_parser_push(ksv_parser_t *self, ksv_ast_t *ast);
+static KSV_STATUS ksv_parser_push(ksv_parser_t *self, ksv_ast_t *ast);
 
-BOOL ksv_parser_parse(ksv_parser_t *self, ksv_lexer_t *lexer)
+KSV_STATUS ksv_parser_parse(ksv_parser_t *self, ksv_lexer_t *lexer)
 {
     assert(self);
     assert(lexer);
@@ -75,40 +79,44 @@ BOOL ksv_parser_parse(ksv_parser_t *self, ksv_lexer_t *lexer)
         if (token && KSV_TOKEN_QUOTE == ksv_token_type(token)) {
             ksv_ast_t *ast = ksv_ast_new(KSV_AST_FIELD);
             if (!ast)
-                goto ERROR_KSV_PARSER;
+                return KSV_NO_MEMORY;
 
             /* Consume starting quote. */
-            if (!ksv_ast_add_token(ast, token))
-                goto ERROR_KSV_PARSER;
+            KSV_STATUS s = ksv_ast_add_token(ast, token);
+            if (KSV_SUCCESS != s)
+                return s;
 
             token = ksv_lexer_next(lexer);
             while (token) {
                 if (token && KSV_TOKEN_QUOTE == ksv_token_type(token)) {
                     /* Consume the quote. */
                     if (token) {
-                        if (!ksv_ast_add_token(ast, token))
-                            goto ERROR_KSV_PARSER;
+                        s = ksv_ast_add_token(ast, token);
+                        if (KSV_SUCCESS != s)
+                            return s;
                     }
 
                     token = ksv_lexer_next(lexer);
                     if (token && KSV_TOKEN_QUOTE == ksv_token_type(token)) {
                         /* Consume escaped quote. */
                         if (token) {
-                            if (!ksv_ast_add_token(ast, token))
-                                goto ERROR_KSV_PARSER;
+                            s = ksv_ast_add_token(ast, token);
+                            if (KSV_SUCCESS != s)
+                                return s;
                         }
 
                         /* Keep consuming quoted string. */
                         token = ksv_lexer_next(lexer);
                     }
                     else {
-                        if (!ksv_parser_push(self, ast))
-                            goto ERROR_KSV_PARSER;
+                        s = ksv_parser_push(self, ast);
+                        if (KSV_SUCCESS != s)
+                            return s;
 
                     #if DEBUG
                         char *out = ksv_ast_string(ast);
                         if (!ast)
-                            goto ERROR_KSV_PARSER;
+                            return KSV_NO_MEMORY;
 
                         PUTERR("Parse quoted field: -->%s<--", out);
 
@@ -121,8 +129,9 @@ BOOL ksv_parser_parse(ksv_parser_t *self, ksv_lexer_t *lexer)
                 else {
                     /* Consume a token greedily. */
                     if (token) {
-                        if (!ksv_ast_add_token(ast, token))
-                            goto ERROR_KSV_PARSER;
+                        s = ksv_ast_add_token(ast, token);
+                        if (KSV_SUCCESS != s)
+                            return s;
                     }
 
                     /* Keep consuming quoted string. */
@@ -133,18 +142,20 @@ BOOL ksv_parser_parse(ksv_parser_t *self, ksv_lexer_t *lexer)
         else if (token && KSV_TOKEN_DELIMETER == ksv_token_type(token)) {
             ksv_ast_t *ast = ksv_ast_new(KSV_AST_DELIMITER);
             if (!ast)
-                goto ERROR_KSV_PARSER;
+                return KSV_NO_MEMORY;
 
-            if (!ksv_ast_add_token(ast, token))
-                goto ERROR_KSV_PARSER;
+            KSV_STATUS s = ksv_ast_add_token(ast, token);
+            if (KSV_SUCCESS != s)
+                return s;
 
-            if (!ksv_parser_push(self, ast))
-                goto ERROR_KSV_PARSER;
+            s = ksv_parser_push(self, ast);
+            if (KSV_SUCCESS != s)
+                return s;
 
         #if DEBUG
             char *out = ksv_ast_string(ast);
             if (!out)
-                goto ERROR_KSV_PARSER;
+                return KSV_NO_MEMORY;
 
             PUTERR("Parse delimiter: -->%s<--", out);
 
@@ -156,18 +167,20 @@ BOOL ksv_parser_parse(ksv_parser_t *self, ksv_lexer_t *lexer)
         else if (token && KSV_TOKEN_END_OF_LINE == ksv_token_type(token)) {
             ksv_ast_t *ast = ksv_ast_new(KSV_AST_EOL);
             if (!ast)
-                goto ERROR_KSV_PARSER;
+                return KSV_NO_MEMORY;
 
-            if (!ksv_ast_add_token(ast, token))
-                goto ERROR_KSV_PARSER;
+            KSV_STATUS s = ksv_ast_add_token(ast, token);
+            if (KSV_SUCCESS != s)
+                return s;
 
-            if (!ksv_parser_push(self, ast))
-                goto ERROR_KSV_PARSER;
+            s = ksv_parser_push(self, ast);
+            if (KSV_SUCCESS != s)
+                return s;
 
         #if DEBUG
             char *out = ksv_ast_string(ast);
             if (!out)
-                goto ERROR_KSV_PARSER;
+                return KSV_NO_MEMORY;
 
             PUTERR("Parse EOL: -->%s<--", out);
 
@@ -180,18 +193,20 @@ BOOL ksv_parser_parse(ksv_parser_t *self, ksv_lexer_t *lexer)
         else if (token && KSV_TOKEN_STRING == ksv_token_type(token)) {
             ksv_ast_t *ast = ksv_ast_new(KSV_AST_FIELD);
             if (!ast)
-                goto ERROR_KSV_PARSER;
+                return KSV_NO_MEMORY;
 
-            if (!ksv_ast_add_token(ast, token))
-                goto ERROR_KSV_PARSER;
+            KSV_STATUS s = ksv_ast_add_token(ast, token);
+            if (KSV_SUCCESS != s)
+                return s;
 
-            if (!ksv_parser_push(self, ast))
-                goto ERROR_KSV_PARSER;
+            s = ksv_parser_push(self, ast);
+            if (KSV_SUCCESS != s)
+                return s;
 
         #if DEBUG
             char *out = ksv_ast_string(ast);
             if (!out)
-                goto ERROR_KSV_PARSER;
+                return KSV_NO_MEMORY;
 
             PUTERR("Parse field: -->%s<--", out);
 
@@ -201,49 +216,51 @@ BOOL ksv_parser_parse(ksv_parser_t *self, ksv_lexer_t *lexer)
             token = ksv_lexer_next(lexer);  /* Token for next round. */
         }
         else {
+        #if DEBUG
             PUTERR("Unknown token");
+        #endif
 
-            token = ksv_lexer_next(lexer);  /* Token for next round. */
+            return KSV_ERROR_PARSING;
         }
     }
 
-    return TRUE;
-
-ERROR_KSV_PARSER:
-    return FALSE;
+    return KSV_SUCCESS;
 }
 
-static BOOL ksv_parser_expand(ksv_parser_t *self);
+static KSV_STATUS ksv_parser_expand(ksv_parser_t *self);
 
-static BOOL ksv_parser_push(ksv_parser_t *self, ksv_ast_t *ast)
+static KSV_STATUS ksv_parser_push(ksv_parser_t *self, ksv_ast_t *ast)
 {
     assert(self);
     assert(ast);
 
-    if (!ksv_parser_expand(self))
-        return FALSE;
+    KSV_STATUS s = ksv_parser_expand(self);
+    if (KSV_SUCCESS != s)
+        return s;
 
     self->asts[self->size] = ast;
     self->size += 1;
 
-    return TRUE;
+    return KSV_SUCCESS;
 }
 
-static BOOL ksv_parser_expand(ksv_parser_t *self)
+static KSV_STATUS ksv_parser_expand(ksv_parser_t *self)
 {
     assert(self);
 
     if (self->size + 1 <= self->capacity)
-        return TRUE;
+        return KSV_SUCCESS;
 
     self->capacity <<= 1;
     ksv_ast_t **old_asts = self->asts;
     ksv_ast_t **new_asts = \
         (ksv_ast_t **) malloc(self->capacity * sizeof(ksv_ast_t *));
     if (!(new_asts)) {
+    #if DEBUG
         PUTERR("Failed to allocate memory for the asts of ksv parser");
         PUTERR("Check available system memory");
-        return FALSE;
+    #endif
+        return KSV_NO_MEMORY;
     }
 
     {
@@ -261,7 +278,7 @@ static BOOL ksv_parser_expand(ksv_parser_t *self)
     self->asts = new_asts;
     free(old_asts);
 
-    return TRUE;
+    return KSV_SUCCESS;
 }
 
 ksv_ast_t * ksv_parser_next(ksv_parser_t *self)

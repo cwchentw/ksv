@@ -13,8 +13,10 @@ ksv_token_t * ksv_token_new(KSV_TOKEN_TYPE type, char *string)
     ksv_token_t *token = \
         (ksv_token_t *) malloc(sizeof(ksv_token_t));
     if (!token) {
+    #if DEBUG
         PUTERR("Failed to allocate memory for csv token");
         PUTERR("Check available system memory");
+    #endif
         return token;
     }
 

@@ -20,8 +20,10 @@ ksv_lexer_t * ksv_lexer_new(char *delimeter, char *end_of_line, char quote)
 {
     ksv_lexer_t *lexer = (ksv_lexer_t *) malloc(sizeof(ksv_lexer_t));
     if (!lexer) {
+    #if DEBUG
         PUTERR("Failed to allocate memory for csv lexer");
         PUTERR("Check available system memory");
+    #endif
         return lexer;
     }
 
@@ -36,8 +38,10 @@ ksv_lexer_t * ksv_lexer_new(char *delimeter, char *end_of_line, char quote)
     lexer->tokens = \
         (ksv_token_t **) malloc(lexer->capacity * sizeof(ksv_token_t *));
     if (!(lexer->tokens)) {
+    #if DEBUG
         PUTERR("Failed to allocate memory for tokens of csv lexer");
         PUTERR("Check available system memory");
+    #endif
         free(lexer);
         return NULL;
     }
@@ -70,9 +74,9 @@ void ksv_lexer_delete(void *self)
     free(self);
 }
 
-static BOOL ksv_lexer_push(ksv_lexer_t *self, ksv_token_t *token);
+static KSV_STATUS ksv_lexer_push(ksv_lexer_t *self, ksv_token_t *token);
 
-BOOL ksv_lexer_lex(ksv_lexer_t *self, char *input)
+KSV_STATUS ksv_lexer_lex(ksv_lexer_t *self, char *input)
 {
     assert(self);
 
@@ -88,7 +92,7 @@ BOOL ksv_lexer_lex(ksv_lexer_t *self, char *input)
                 if (0 == strcmp("\n", self->end_of_line)) {
                     char *eol = string_allocate("\n");
                     if (!eol)
-                        return FALSE;
+                        return KSV_NO_MEMORY;
 
                 #if DEBUG
                     PUTERR("EOL as token: -->%s<--", eol);
@@ -97,10 +101,11 @@ BOOL ksv_lexer_lex(ksv_lexer_t *self, char *input)
                     ksv_token_t *token = \
                         ksv_token_new(KSV_TOKEN_END_OF_LINE, eol);
                     if (!token)
-                        return FALSE;
+                        return KSV_NO_MEMORY;
 
-                    if (!ksv_lexer_push(self, token))
-                        return FALSE;
+                    KSV_STATUS s = ksv_lexer_push(self, token);
+                    if (KSV_SUCCESS != s)
+                        return s;
                 }
                 else {
                     goto LEX_STRING;
@@ -111,7 +116,7 @@ BOOL ksv_lexer_lex(ksv_lexer_t *self, char *input)
                     if (i+1 < strlen(input) && '\n' == input[i+1]) {
                         char *eol = string_allocate("\r\n");
                         if (!eol)
-                            return FALSE;
+                            return KSV_NO_MEMORY;
 
                     #if DEBUG
                         PUTERR("EOL as token: -->%s<--", eol);
@@ -120,10 +125,11 @@ BOOL ksv_lexer_lex(ksv_lexer_t *self, char *input)
                         ksv_token_t *token = \
                             ksv_token_new(KSV_TOKEN_END_OF_LINE, eol);
                         if (!token)
-                            return FALSE;
+                            return KSV_NO_MEMORY;
 
-                        if (!ksv_lexer_push(self, token))
-                            return FALSE;
+                        KSV_STATUS s = ksv_lexer_push(self, token);
+                        if (KSV_SUCCESS != s)
+                            return s;
 
                         i += 1;
                     }
@@ -135,7 +141,7 @@ BOOL ksv_lexer_lex(ksv_lexer_t *self, char *input)
             else if (self->quote == input[i]) {
                 char *quote = string_allocate_char(self->quote);
                 if (!quote)
-                    return FALSE;
+                    return KSV_NO_MEMORY;
 
             #if DEBUG
                 PUTERR("Quote as token: -->%s<--", quote);
@@ -144,10 +150,11 @@ BOOL ksv_lexer_lex(ksv_lexer_t *self, char *input)
                 ksv_token_t *token = \
                     ksv_token_new(KSV_TOKEN_QUOTE, quote);
                 if (!token)
-                    return FALSE;
+                    return KSV_NO_MEMORY;
 
-                if (!ksv_lexer_push(self, token))
-                    return FALSE;
+                KSV_STATUS s = ksv_lexer_push(self, token);
+                if (KSV_SUCCESS != s)
+                    return s;
             }
             else if (self->delimeter[0] == input[i]) {
                 for (j = 0; j < strlen(self->delimeter) && i+j < strlen(input); j++) {
@@ -157,7 +164,7 @@ BOOL ksv_lexer_lex(ksv_lexer_t *self, char *input)
 
                 char *delim = string_allocate(self->delimeter);
                 if (!delim)
-                    return FALSE;
+                    return KSV_NO_MEMORY;
 
             #if DEBUG
                 PUTERR("Delimeter as token: -->%s<--", delim);
@@ -166,10 +173,11 @@ BOOL ksv_lexer_lex(ksv_lexer_t *self, char *input)
                 ksv_token_t *token = \
                     ksv_token_new(KSV_TOKEN_DELIMETER, delim);
                 if (!token)
-                    return FALSE;
+                    return KSV_NO_MEMORY;
 
-                if (!ksv_lexer_push(self, token))
-                    return FALSE;
+                KSV_STATUS s = ksv_lexer_push(self, token);
+                if (KSV_SUCCESS != s)
+                    return s;
 
                 i += j - 1;
             }
@@ -205,7 +213,7 @@ BOOL ksv_lexer_lex(ksv_lexer_t *self, char *input)
 
                 char *s = string_allocate_substring(input, i, j - 1);
                 if (!s)
-                    return FALSE;
+                    return KSV_NO_MEMORY;
 
             #if DEBUG
                 PUTERR("String as token: -->%s<--", s);
@@ -214,50 +222,53 @@ BOOL ksv_lexer_lex(ksv_lexer_t *self, char *input)
                 ksv_token_t *token = \
                     ksv_token_new(KSV_TOKEN_STRING, s);
                 if (!token)
-                    return FALSE;
+                    return KSV_NO_MEMORY;
 
-                if (!ksv_lexer_push(self, token))
-                    return FALSE;
+                KSV_STATUS status = ksv_lexer_push(self, token);
+                if (KSV_SUCCESS != status)
+                    return status;
 
                 i = j - 1;
             }
         }
     }
 
-    return TRUE;
+    return KSV_SUCCESS;
 }
 
-static BOOL ksv_lexer_expand(ksv_lexer_t *self);
+static KSV_STATUS ksv_lexer_expand(ksv_lexer_t *self);
 
-static BOOL ksv_lexer_push(ksv_lexer_t *self, ksv_token_t *token)
+static KSV_STATUS ksv_lexer_push(ksv_lexer_t *self, ksv_token_t *token)
 {
     assert(self);
     assert(token);
 
-    if (!ksv_lexer_expand(self))
-        return FALSE;
+    if (KSV_SUCCESS != ksv_lexer_expand(self))
+        return KSV_NO_MEMORY;
 
     self->tokens[self->size] = token;
     self->size += 1;
 
-    return TRUE;
+    return KSV_SUCCESS;
 }
 
-static BOOL ksv_lexer_expand(ksv_lexer_t *self)
+static KSV_STATUS ksv_lexer_expand(ksv_lexer_t *self)
 {
     assert(self);
 
     if (self->size + 1 <= self->capacity)
-        return TRUE;
+        return KSV_SUCCESS;
 
     self->capacity <<= 1;
     ksv_token_t **old_tokens = self->tokens;
     ksv_token_t **new_tokens = \
         (ksv_token_t **) malloc(self->capacity * sizeof(ksv_token_t *));
     if (!new_tokens) {
+    #if DEBUG
         PUTERR("Failed to allocate tokens for csv lexer");
         PUTERR("Check available system memory");
-        return FALSE;
+    #endif
+        return KSV_NO_MEMORY;
     }
 
     {
@@ -275,7 +286,7 @@ static BOOL ksv_lexer_expand(ksv_lexer_t *self)
     self->tokens = new_tokens;
     free(old_tokens);
 
-    return TRUE;
+    return KSV_SUCCESS;
 }
 
 void ksv_lexer_start(ksv_lexer_t *self)
