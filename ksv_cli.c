@@ -116,14 +116,23 @@ KSV_STATUS show_sheet(FILE *stream, ksv_t *ksv)
         BOOL is_column_valid = TRUE;
         while (is_column_valid) {
             size_t sz = 0;
+
             char *header = ksv_next_header(ksv);
             sz = sz > strlen(header) ? sz : strlen(header);
 
             char *field = ksv_next_data_by_column(ksv);
+        #if DEBUG
+            if (field)
+                PUTERR("Field to compare: -->%s<--", field);
+        #endif
             while (field) {
                 sz = sz > strlen(field) ? sz : strlen(field);
 
                 field = ksv_next_data_by_column(ksv);
+            #if DEBUG
+                if(field)
+                    PUTERR("Field to compare: -->%s<--", field);
+            #endif
             }
 
             ss[i] = sz;
@@ -326,6 +335,7 @@ KSV_STATUS show_sheet(FILE *stream, ksv_t *ksv)
     fprintf(stream, "%s%s", line, END_OF_LINE);
 
     free(line);
+
     free(ss);
 
     return KSV_SUCCESS;

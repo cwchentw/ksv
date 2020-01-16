@@ -16,6 +16,7 @@ struct ksv_t {
     size_t capacity_rows;
     size_t index_col;
     size_t index_row;
+    size_t index;
     char **header;
     char **rows;
     char *delimeter;
@@ -162,7 +163,7 @@ BOOL ksv_next_column(ksv_t *self)
 {
     assert(self);
 
-    if (self->index_col * self->row + self->index_row >= self->size_rows)
+    if (self->index_col + 1 >= self->col)
         return FALSE;
 
     self->index_col += 1;
@@ -175,13 +176,13 @@ char * ksv_next_data_by_column(ksv_t *self)
 {
     assert(self);
 
-    if (self->index_row >= self->row)
+    if (self->index_row + self->index_col >= self->size_rows)
         return NULL;
 
-    size_t index = self->index_col * self->row + self->index_row;
+    size_t index = self->index_row + self->index_col;
     char *field =  self->rows[index];
 
-    self->index_row += 1;
+    self->index_row += self->col;
 
     return field;
 }
