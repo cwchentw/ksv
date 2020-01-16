@@ -20,13 +20,16 @@ ksv_argument_t * ksv_argument_parse(int argc, char *argv[])
     {
         int i;
         for (i = 1; i < argc; ++i) {
-            if (0 == strcmp("-v", argv[i])
-                || 0 == strcmp("--version", argv[i])) {
+            if (0 == strcmp("version", argv[i])) {
                 arg->command = KSV_COMMAND_VERSION;
                 break;
             }
-            else if (0 == strcmp("--license", argv[i])) {
+            else if (0 == strcmp("license", argv[i])) {
                 arg->command = KSV_COMMAND_LICENSE;
+                break;
+            }
+            else if (0 == strcmp("help", argv[i])) {
+                arg->command = KSV_COMMAND_HELP;
                 break;
             }
         }

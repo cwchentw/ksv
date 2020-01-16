@@ -8,7 +8,7 @@
 int main(int argc, char *argv[])
 {
     if (argc < 2) {
-        PUTERR("No valid input");
+        ksv_help(stderr);
         return 1;
     }
 
@@ -29,6 +29,9 @@ int main(int argc, char *argv[])
         goto END_CSV;
     case KSV_COMMAND_LICENSE:
         ksv_license();
+        goto END_CSV;
+    case KSV_COMMAND_HELP:
+        ksv_help(stdout);
         goto END_CSV;
     }
 

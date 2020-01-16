@@ -1,0 +1,25 @@
+#include <stdio.h>
+#include "ksv_help.h"
+#include "ksv_metadata.h"
+
+#ifndef END_OF_LINE
+    #if _WIN32
+        #define  END_OF_LINE  "\r\n"
+    #elif __unix__ || __unix || unix || __APPLE__
+        #define  END_OF_LINE  "\n"
+    #else
+        #error  "Unsupported file"
+    #endif
+#endif  /* END_OF_LINE */
+
+/*-------1---------2---------3---------4---------5---------6---------7---------8*/
+/*345678901234567890123456789012345678901234567890123456789012345678901234567890*/
+void ksv_help(FILE *stream)
+{
+    fprintf(stream, "Usage: %s [subcommand] [sheet.csv]%s", KSV_PROGRAM, END_OF_LINE);
+    fprintf(stream, "%s", END_OF_LINE);
+    fprintf(stream, "Subcommand:%s", END_OF_LINE);
+    fprintf(stream, "    version\tShow version info and exit%s", END_OF_LINE);
+    fprintf(stream, "    license\tShow license info and exit%s", END_OF_LINE);
+    fprintf(stream, "    help\tShow help info and exit%s", END_OF_LINE);
+}
