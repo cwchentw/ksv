@@ -186,6 +186,34 @@ char * ksv_next_data_by_column(ksv_t *self)
     return field;
 }
 
+BOOL ksv_next_row(ksv_t *self)
+{
+    assert(self);
+
+    if (self->index_row * self->col + self->index_col >= self->size_rows)
+        return FALSE;
+
+    self->index_col = 0;
+    self->index_row += 1;
+
+    return TRUE;
+}
+
+char * ksv_next_data_by_row(ksv_t *self)
+{
+    assert(self);
+
+    if (self->index_col >= self->col)
+        return NULL;
+
+    size_t index = self->index_row * self->col + self->index_col;
+    char *field = self->rows[index];
+
+    self->index_col += 1;
+
+    return field;
+}
+
 static KSV_STATUS ksv_header_push(ksv_t *self, char *field);
 static KSV_STATUS ksv_rows_push(ksv_t *self, char *field);
 

@@ -217,7 +217,7 @@ KSV_STATUS show_sheet(FILE *stream, ksv_t *ksv)
 
     line[0] = '\0';
 
-    /* Print top horizontal line */
+    /* Print horizontal line */
     {
         size_t i;
         for (i = 0; i < total; ++i)
@@ -233,7 +233,97 @@ KSV_STATUS show_sheet(FILE *stream, ksv_t *ksv)
 
     fprintf(stream, "%s%s", line, END_OF_LINE);
 
-    line[total] = '\0';
+    line[0] = '\0';
+
+    /* Print data. */
+    {
+        ksv_restart(ksv);
+
+        BOOL is_row_valid = TRUE;
+        while (is_row_valid) {
+            line[0] = '|';
+            line[1] = '\0';
+
+            char *field = ksv_next_data_by_row(ksv);
+
+            size_t i = 0;
+            size_t temp = 1;
+            while (field) {
+                size_t sz = strlen(field);
+
+            #if DEBUG
+                PUTERR("Line: -->%s<--", line);
+                PUTERR("Data to print: -->%s<--", field);
+            #endif
+
+                if (sz < ss[i]) {
+                #if DEBUG
+                    PUTERR("ss: %lu sz: %lu", ss[i], sz);
+                #endif
+                    size_t j;
+                    for (j = 0; j < ss[i] - sz; ++j) {
+                    #if DEBUG
+                        PUTERR("temp: %lu j: %lu", temp, j);
+                    #endif
+                        line[temp+j] = ' ';
+                    }
+
+                    line[temp+ss[i]-sz] = '\0';
+                    temp += ss[i] - sz;
+
+                #if DEBUG
+                    PUTERR("Line: -->%s<--", line);
+                #endif
+
+                    strcpy(line+temp, field);
+
+                    line[temp+strlen(field)] = '|';
+                    line[temp+strlen(field)+1] = '\0';
+                
+                #if DEBUG
+                    PUTERR("Line: -->%s<--", line);
+                #endif
+
+                    temp += strlen(field)+1;
+                }
+                else {
+                    strcpy(line+temp, field);
+                    line[temp+sz] = '|';
+                    line[temp+sz+1] = '\0';
+                    temp += sz + 1;
+                }
+
+                ++i;
+                field = ksv_next_data_by_row(ksv);
+            }
+            line[total] = '\0';
+
+            fprintf(stream, "%s%s", line, END_OF_LINE);
+
+            line[0] = '\0';
+
+            if (!ksv_next_row(ksv))
+                is_row_valid = FALSE;
+        }
+    }
+
+    line[0] = '\0';
+
+    /* Print horizontal line */
+    {
+        size_t i;
+        for (i = 0; i < total; ++i)
+            line[i] = '-';
+
+        line[0] = '+';
+        size_t temp = 1;
+        for (i = 0; i < ksv_col(ksv); i+=1) {
+            line[temp+ss[i]] = '+';
+            temp += ss[i]+1;
+        }
+    }
+
+    fprintf(stream, "%s%s", line, END_OF_LINE);
 
     free(line);
     free(ss);

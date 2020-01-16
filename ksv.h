@@ -38,6 +38,8 @@ void ksv_restart(ksv_t *self);
 char * ksv_next_header(ksv_t *self);
 BOOL ksv_next_column(ksv_t *self);
 char * ksv_next_data_by_column(ksv_t *self);
+BOOL ksv_next_row(ksv_t *self);
+char * ksv_next_data_by_row(ksv_t *self);
 
 #ifdef __cplusplus
 }
