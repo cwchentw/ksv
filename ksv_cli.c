@@ -39,19 +39,22 @@ int main(int argc, char *argv[])
         goto END_CSV;
     }
 
-    /* Refactor it later. */
     const char *path = ksv_argument_path(arg);
+    if (!path) {
+       PUTERR("No valid path");
+       goto ERROR_KSV;
+    }
 
 #if _MSC_VER
     if (0 != fopen_s(&fp, path, "r")) {
         PUTERR("Failed to open file at %s", path);
-        return 1;
+        goto ERROR_KSV;
     }
 #else
     fp = fopen(path, "r");
     if (!fp) {
         PUTERR("Failed to open file at %s", path);
-        return 1;
+        goto ERROR_KSV;
     }
 #endif
 
