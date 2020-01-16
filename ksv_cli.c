@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include "ksv.h"
 #include "ksv_argument.h"
+#include "ksv_help.h"
+#include "ksv_metadata.h"
 #include "print.h"
 
 int main(int argc, char *argv[])
@@ -18,6 +20,16 @@ int main(int argc, char *argv[])
     if (!arg) {
         PUTERR("Failed to parse command line arguments");
         return 1;
+    }
+
+    KSV_COMMAND_TYPE command = ksv_argument_command(arg);
+    switch (command) {
+    case KSV_COMMAND_VERSION:
+        ksv_version();
+        goto END_CSV;
+    case KSV_COMMAND_LICENSE:
+        ksv_license();
+        goto END_CSV;
     }
 
     /* Refactor it later. */
@@ -43,9 +55,15 @@ int main(int argc, char *argv[])
     if (KSV_SUCCESS != ksv_load_stream_with_header_strictly(ksv, fp))
         goto ERROR_KSV;
 
-    ksv_delete(ksv);
-    fclose(fp);
-    ksv_argument_delete(arg);
+END_CSV:
+    if (ksv)
+        ksv_delete(ksv);
+
+    if (fp)
+        fclose(fp);
+
+    if (arg)
+        ksv_argument_delete(arg);
 
     return 0;
 
