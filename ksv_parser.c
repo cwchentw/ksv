@@ -81,19 +81,22 @@ KSV_STATUS ksv_parser_parse(ksv_parser_t *self, ksv_lexer_t *lexer)
             if (!ast)
                 return KSV_NO_MEMORY;
 
-            /* Pass. */
+            /* Drop the token. */
+            ksv_token_delete(token);
 
             /* Consume next token. */
             token = ksv_lexer_next(lexer);
             while (token) {
                 if (token && KSV_TOKEN_QUOTE == ksv_token_type(token)) {
-                    /* Pass. */
+                    /* Drop the token. */
+                    ksv_token_delete(token);
 
                     /* Consume next token. */
                     token = ksv_lexer_next(lexer);
 
                     if (token && KSV_TOKEN_QUOTE == ksv_token_type(token)) {
-                        /* Pass. */
+                        /* Drop the token. */
+                        ksv_token_delete(token);
 
                         /* Keep consuming quoted string. */
                         token = ksv_lexer_next(lexer);
