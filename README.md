@@ -22,11 +22,17 @@ We test **ksv** against several Unix or Unix-like systems:
 
 In addition, we test **ksv** against Windows 10 as well.
 
-## Usage
+## Usage of the Library
+
+Pending.
+
+## Usage of the Console Tool
 
 Pending.
 
 ## Note
+
+Currently, **ksv** is distributed mainly as a C library. The **ksv** cli tool is just a byproduct of the library, never a feature-rich CSV tool.
 
 We copy some utility code from [cwchentw/clibs](https://github.com/cwchentw/clibs).
 
