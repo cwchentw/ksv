@@ -1,6 +1,6 @@
 # ksv
 
-Yet another CSV library for C.
+Yet another CSV or TSV library for C.
 
 ## System Requirements
 
@@ -32,7 +32,7 @@ Pending.
 
 ## Note
 
-Currently, **ksv** is distributed mainly as a C library. The **ksv** cli tool is just a byproduct of the library, never a feature-rich CSV tool.
+Currently, **ksv** is distributed mainly as a C library. The **ksv** cli tool is just a byproduct of the library, never a feature-rich CSV ro TSV tool.
 
 We copy some utility code from [cwchentw/clibs](https://github.com/cwchentw/clibs).
 
