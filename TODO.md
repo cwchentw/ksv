@@ -1,3 +1,4 @@
+* Refactor the project into a nested project
 * Add automated tests for `ksv` cli utility
 * Add subcommand
   * `concat`: concat two CSV sheets according to its header
