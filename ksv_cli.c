@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
     if (!ksv)
         goto ERROR_KSV;
 
-    if (KSV_SUCCESS != ksv_load_stream_with_header_strictly(ksv, fp))
+    if (KSV_SUCCESS != ksv_load_table_with_header_strictly(ksv, fp))
         goto ERROR_KSV;
 
 #if DEBUG

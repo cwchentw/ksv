@@ -225,7 +225,7 @@ char * ksv_next_data_by_row(ksv_t *self)
 static KSV_STATUS ksv_header_push(ksv_t *self, char *field);
 static KSV_STATUS ksv_rows_push(ksv_t *self, char *field);
 
-KSV_STATUS ksv_load_stream_with_header_strictly(ksv_t *self, FILE *stream)
+KSV_STATUS ksv_load_table_with_header_strictly(ksv_t *self, FILE *stream)
 {
     assert(self);
 
