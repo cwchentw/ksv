@@ -9,9 +9,33 @@
 
 #if _MSC_VER
     #include <windows.h>
+#else  /* !_MSC_VER */
+#ifdef __cplusplus
+    #ifndef _BOOL_IS_DEFINED
+        typedef bool BOOL;
+        #define FALSE  false
+        #define TRUE   true
+        #define _BOOL_IS_DEFINED
+    #endif  /* BOOL */
 #else
-    #include "boolean.h"
-#endif
+    #if __STDC_VERSION__ < 199901L
+        #ifndef _BOOL_IS_DEFINED
+            typedef char BOOL;
+            #define FALSE  0
+            #define TRUE   1
+            #define _BOOL_IS_DEFINED
+        #endif  /* BOOL */
+    #else
+        #ifndef _BOOL_IS_DEFINED
+            #include <stdbool.h>
+            typedef bool BOOL;
+            #define FALSE  false
+            #define TRUE   true
+            #define _BOOL_IS_DEFINED
+        #endif  /* BOOL */
+    #endif  /* C89 */
+#endif  /* __cplusplus */
+#endif  /* _MSC_VER */
 
 typedef unsigned char KSV_STATUS;
 
