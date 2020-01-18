@@ -5,114 +5,26 @@ else
 endif
 
 ifeq ($(detected_OS),Windows)
-	RM=del /q /f
+	SEP=\\
+else
+	SEP=/
 endif
 
-CC=
-ifeq (,$(CC))
-ifeq ($(detected_OS),Windows)
-	CC=cl.exe
-else
-ifeq ($(detected_OS),Darwin)
-	CC=clang
-else
-	CC=gcc
-endif  # Darwin
-endif  # Windows
-endif  # CC
+SRC_DIR=src
 
-ifeq ($(detected_OS),Windows)
-	TARGET=ksv.exe
-else
-	TARGET=ksv
-endif
-
-CL := cl icl
-
-ifneq (,$(findstring $(CC),$(CL)))
-	LIB_STATIC=ksv.lib
-	LIB_DYNAMIC=ksv.dll
-	CFLAGS=/W4 /sdl
-else
-	LIB_STATIC=libksv.a
-ifeq ($(detected_OS),Darwin)
-	LIB_DYNAMIC=libksv.dylib
-else
-	LIB_DYNAMIC=libksv.so
-endif
-	CFLAGS=-Wall -Wextra -std=c89
-endif
-
-ifneq (,$(DEBUG))
-ifneq (,$(findstring $(CC),$(CL)))
-	CFLAGS+=/D DEBUG
-else
-	CFLAGS+=-DDEBUG
-endif
-endif
-
-ifneq (,$(findstring $(CC),$(CL)))
-	OBJS=cstring.obj ksv_token.obj ksv_lexer.obj \
-		ksv_ast.obj ksv_parser.obj ksv.obj
-	EXEC_OBJS=ksv_help.obj ksv_argument.obj ksv_cli.obj
-else
-	OBJS=cstring.o ksv_token.o ksv_lexer.o \
-		ksv_ast.o ksv_parser.o ksv.o
-	EXEC_OBJS=ksv_help.o ksv_argument.o ksv_cli.o
-endif
-
-
-.PHONY: all dynamic static exec clean_obj clean
+.PHONY: all dynamic static exec clean
 
 all:
-	$(MAKE) dynamic
-	$(MAKE) clean_obj
-	$(MAKE) static
-	$(MAKE) exec
+	$(MAKE) -C .$(SEP)$(SRC_DIR)
 
-exec: $(TARGET)
+dynamic:
+	$(MAKE) -C .$(SEP)$(SRC_DIR) dynamic
 
-$(TARGET): $(LIB_STATIC) $(EXEC_OBJS)
-ifneq (,$(findstring $(CC),$(CL)))
-	$(CC) /Fe:$(TARGET) $(EXEC_OBJS) $(LIB_STATIC) $(CFLAGS)
-else
-	$(CC) -o $(TARGET) $(EXEC_OBJS) $(LIB_STATIC) $(CFLAGS)
-endif
+static:
+	$(MAKE) -C .$(SEP)$(SRC_DIR) static
 
-dynamic: $(LIB_DYNAMIC)
-
-$(LIB_DYNAMIC): $(OBJS)
-ifneq (,$(findstring $(CC),$(CL)))
-	link /DLL /OUT:$(LIB_DYNAMIC) $(OBJS)
-else
-	$(CC) -shared -o $(LIB_DYNAMIC) $(OBJS)
-endif
-
-static: $(LIB_STATIC)
-
-$(LIB_STATIC): $(OBJS)
-ifneq (,$(findstring $(CC),$(CL)))
-	lib /out:$(LIB_STATIC) $(OBJS)
-else
-ifeq ($(detected_OS),Darwin)
-	libtool -static -o $(LIB_STATIC) $(OBJS)
-else
-	$(AR) rcs $(LIB_STATIC) $(OBJS)
-endif
-endif
-
-%.obj: %.c
-	$(CC) /c $< $(CFLAGS)
-
-%.o: %.c
-ifeq (dynamic,$(MAKECMDGOALS))
-	$(CC) -fPIC -c $< $(CFLAGS)
-else
-	$(CC) -c $< $(CFLAGS)
-endif
-
-clean_obj:
-	$(RM) $(OBJS)
+exec:
+	$(MAKE) -C .$(SEP)$(SRC_DIR) exec
 
 clean:
-	$(RM) $(OBJS) $(EXEC_OBJS) $(LIB_DYNAMIC) $(LIB_STATIC) $(TARGET)
+	$(MAKE) -C .$(SEP)$(SRC_DIR) clean
