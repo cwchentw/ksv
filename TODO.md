@@ -5,4 +5,5 @@
   * `hcat`: concat two or more CSV sheets horizontally
   * (low priority) `sql`: filter CSV sheet with SQL-like language
 * Add row number for ksv table
+* Add dllexport and dllimport for Visual C++
 * Fix some unknown Visual C++ specific issue
