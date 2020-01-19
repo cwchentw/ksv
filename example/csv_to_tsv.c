@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "ksv.h"
 #include "print.h"
 
@@ -57,6 +58,7 @@ int main(int argc, char *argv[])
         PUTS("\b");
     }
 
+    ksv_delete(ksv);
     fclose(fp);
 
     return 0;

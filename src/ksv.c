@@ -78,7 +78,6 @@ void ksv_delete(void *self)
 {
     assert(self);
 
-    size_t row = ((ksv_t *) self)->row;
     size_t col = ((ksv_t *) self)->col;
 
     char **header = ((ksv_t *) self)->header;
@@ -92,10 +91,11 @@ void ksv_delete(void *self)
         free((void *) header);
     }
 
+    size_t capacity_rows = ((ksv_t *) self)->capacity_rows;
     char **rows = ((ksv_t *) self)->rows;
     if (rows) {
         size_t i;
-        for (i = 0; i < col * row; i++) {
+        for (i = 0; i < capacity_rows; i++) {
             if (rows[i]) {
                 free((void *) rows[i]);
             }
