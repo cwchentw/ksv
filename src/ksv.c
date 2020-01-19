@@ -60,25 +60,12 @@ ksv_t * ksv_new(char *delimeter, char *end_of_line, char *quote)
     csv->index_header = 0;
 
     csv->size_rows = 0;
-    csv->capacity_rows = 64;  /* Arbitrary content width. */
+    csv->capacity_rows = 8;  /* Arbitrary content width. */
     csv->index_col = 0;
     csv->index_row = 0;
 
     csv->header = NULL;  /* CSV sheet may be header-less. */
-
-    csv->rows = (char **) malloc(csv->capacity_rows * sizeof(char *));
-    if (!(csv->rows)) {
-        PUTERR("Failed to allocate rows for csv object");
-        PUTERR("Check available system memory");
-        ksv_delete(csv);
-        return NULL;
-    }
-
-    {
-        size_t i;
-        for (i = 0; i < csv->capacity_rows; i++)
-            csv->rows[i] = NULL;
-    }
+    csv->rows = NULL;  /* Lazy row allocation. */
 
     csv->delimeter = delimeter;
     csv->end_of_line = end_of_line;
@@ -233,6 +220,28 @@ KSV_STATUS ksv_load_table_with_header_strictly(ksv_t *self, FILE *stream)
     ksv_lexer_t *lexer = NULL;
     ksv_parser_t *parser = NULL;
 
+    KSV_STATUS ksv_status = ksv_load_header(self, stream);
+    if (KSV_SUCCESS != ksv_status)
+        goto ERROR_CSV;
+
+    /* When loading a whole CSV sheet, it is very likely that the count of
+       fields will exceed 64. */
+    self->capacity_rows = 64;
+    self->rows = (char **) malloc(self->capacity_rows * sizeof(char *));
+    if (!(self->rows)) {
+    #if DEBUG
+        PUTERR("Failed to allocate rows for csv object");
+        PUTERR("Check available system memory");
+    #endif
+        return KSV_NO_MEMORY;
+    }
+
+    {
+        size_t i;
+        for (i = 0; i < self->capacity_rows; i++)
+            self->rows[i] = NULL;
+    }
+
     size_t line_width = 150;  /* Sensible initial line width. */
     line = (char *) malloc(line_width * sizeof(char));
     if (!line) {
@@ -242,10 +251,6 @@ KSV_STATUS ksv_load_table_with_header_strictly(ksv_t *self, FILE *stream)
     #endif
         return KSV_NO_MEMORY;
     }
-
-    KSV_STATUS ksv_status = ksv_load_header(self, stream);
-    if (KSV_SUCCESS != ksv_status)
-        goto ERROR_CSV;
 
     ksv_status = KSV_FAILURE;
     while (fgets(line, line_width, stream)) {
