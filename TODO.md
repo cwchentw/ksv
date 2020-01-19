@@ -1,4 +1,3 @@
-* Write a simple example program to test library loading on different systems
 * Add automated tests for `ksv` cli utility
 * Add subcommand
   * `vcat`: concat two or more CSV sheets vertically
