@@ -33,7 +33,10 @@ ksv_argument_t * ksv_argument_parse(int argc, char *argv[])
                 arg->command = KSV_COMMAND_HELP;
                 break;
             }
-            else if (0 == strcmp("show", argv[i])) {
+            else if (0 == strcmp("header", argv[i])) {
+                arg->command = KSV_COMMAND_HEADER;
+            }
+            else if (0 == strcmp("table", argv[i])) {
                 arg->command = KSV_COMMAND_SHOW;
             }
             else {

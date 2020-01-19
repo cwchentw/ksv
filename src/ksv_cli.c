@@ -62,14 +62,27 @@ int main(int argc, char *argv[])
     if (!ksv)
         goto ERROR_KSV;
 
-    if (KSV_SUCCESS != ksv_load_table_with_header_strictly(ksv, fp))
-        goto ERROR_KSV;
+    
 
 #if DEBUG
     PUTERR("CSV dimension (col, row): (%lu, %lu)", ksv_col(ksv), ksv_row(ksv));
 #endif
 
-    if (KSV_COMMAND_SHOW == ksv_argument_command(arg)) {
+    if (KSV_COMMAND_HEADER == ksv_argument_command(arg)) {
+        if (KSV_SUCCESS != ksv_load_header(ksv, fp))
+            goto ERROR_KSV;
+
+        char *field = ksv_next_header(ksv);
+        while (field) {
+            PUTS("%s", field);
+
+            field = ksv_next_header(ksv);
+        }
+    }
+    else if (KSV_COMMAND_SHOW == ksv_argument_command(arg)) {
+        if (KSV_SUCCESS != ksv_load_table_with_header_strictly(ksv, fp))
+            goto ERROR_KSV;
+
         KSV_STATUS s = show_sheet(stdout, ksv);
         if (KSV_SUCCESS != s)
             goto ERROR_KSV;
