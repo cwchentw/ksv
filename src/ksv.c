@@ -518,7 +518,7 @@ KSV_STATUS ksv_load_record(ksv_t *self, FILE *stream)
     /* Re-initialize the internal status of ksv object. */
     self->size_rows = 0;
     self->col = 0;
-    self->row = 1;
+    self->row = 0;
 
     char *line = NULL;
     ksv_lexer_t *lexer = NULL;

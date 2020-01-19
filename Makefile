@@ -11,11 +11,17 @@ else
 endif
 
 SRC_DIR=src
+EXAMPLE_DIR=example
 
-.PHONY: all dynamic static exec clean
+
+.PHONY: all example dynamic static exec clean
 
 all:
 	$(MAKE) -C .$(SEP)$(SRC_DIR)
+
+example:
+	$(MAKE) -C .$(SEP)$(SRC_DIR) dynamic
+	$(MAKE) -C .$(SEP)$(EXAMPLE_DIR)
 
 dynamic:
 	$(MAKE) -C .$(SEP)$(SRC_DIR) dynamic
@@ -28,3 +34,4 @@ exec:
 
 clean:
 	$(MAKE) -C .$(SEP)$(SRC_DIR) clean
+	$(MAKE) -C .$(SEP)$(EXAMPLE_DIR) clean
