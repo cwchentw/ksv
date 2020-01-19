@@ -484,6 +484,159 @@ ERROR_CSV:
     return ksv_status;
 }
 
+KSV_STATUS ksv_load_record(ksv_t *self, FILE *stream)
+{
+    assert(self);
+
+    if (!(self->rows)) {
+        /* Mallocate memory for a row in CSV sheet. */
+        self->rows = \
+            (char **) malloc(self->capacity_rows * sizeof(char *));
+        if (!(self->rows)) {
+        #if DEBUG
+            PUTERR("Failed to allocate rows for csv object");
+            PUTERR("Check available system memory");
+        #endif
+            return KSV_NO_MEMORY;
+        }
+
+        {
+            size_t i;
+            for (i = 0; i < self->capacity_rows; i++)
+                self->rows[i] = NULL;
+        }
+    }
+    else {
+        /* Clean old fields. */
+        size_t i;
+        for (i = 0; i < self->capacity_rows; ++i) {
+            if (self->rows[i])
+                free((void *) self->rows[i]);
+        }
+    }
+
+    /* Re-initialize the internal status of ksv object. */
+    self->size_rows = 0;
+    self->col = 0;
+    self->row = 1;
+
+    char *line = NULL;
+    ksv_lexer_t *lexer = NULL;
+    ksv_parser_t *parser = NULL;
+
+    size_t line_width = 150;  /* Sensible initial line width. */
+    line = (char *) malloc(line_width * sizeof(char));
+    if (!line) {
+    #if DEBUG
+        PUTERR("Failed to allocate memory for C string");
+        PUTERR("Check available system memory");
+    #endif
+        return KSV_NO_MEMORY;
+    }
+
+    KSV_STATUS ksv_status = KSV_FAILURE;
+    while (fgets(line, line_width, stream)) {
+        if (line_width == strlen(line)) {
+            if ('\n' != line[line_width-1]) {
+                line_width <<= 1;
+                if (!realloc(line, line_width)) {
+                #if DEBUG
+                    PUTERR("Failed to realloc memory for C string");
+                    PUTERR("Check available system memory");
+                #endif
+                    ksv_status = KSV_NO_MEMORY;
+                    goto ERROR_CSV;
+                }
+            }
+            else {
+                goto LOAD_LINE;
+            }
+        }
+        else {
+    LOAD_LINE:
+            lexer = ksv_lexer_new(
+                self->delimeter,
+                self->end_of_line,
+                self->quote
+            );
+            if (!lexer) {
+                ksv_status = KSV_NO_MEMORY;
+                goto ERROR_CSV;
+            }
+
+            parser = ksv_parser_new();
+            if (!parser) {
+                ksv_status = KSV_NO_MEMORY;
+                goto ERROR_CSV;
+            }
+
+            ksv_status = ksv_lexer_lex(lexer, line);
+            if (KSV_SUCCESS != ksv_status)
+                goto ERROR_CSV;
+
+            ksv_status = ksv_parser_parse(parser, lexer);
+            if (KSV_SUCCESS != ksv_status)
+                goto ERROR_CSV;
+
+            ksv_ast_t *ast = ksv_parser_next(parser);
+            char *field = NULL;
+            while (ast) {
+                switch (ksv_ast_type(ast)) {
+                case KSV_AST_FIELD:
+                    field = ksv_ast_string(ast);
+                    if (!field) {
+                        ksv_status = KSV_NO_MEMORY;
+                        goto ERROR_CSV;
+                    }
+
+                    ksv_status = ksv_rows_push(self, field);
+                    if (KSV_SUCCESS != ksv_status) {
+                        goto ERROR_CSV;
+                    }
+
+                    self->col += 1;
+                    break;
+                case KSV_AST_DELIMITER:
+                    /* Pass. */
+                    break;
+                case KSV_AST_EOL:
+                    /* Stop reading CSV row. */
+                    break;
+                default:
+                    assert(0 && "Unknown ksv ast");
+                }
+
+                ast = ksv_parser_next(parser);
+            }
+
+            ksv_lexer_delete(lexer);
+            lexer = NULL;
+
+            ksv_parser_delete(parser);
+            parser = NULL;
+        }
+
+        /* Only read first line. */
+        break;
+    }
+
+    free(line);
+
+    return KSV_SUCCESS;
+
+ERROR_CSV:
+    if (parser)
+        ksv_parser_delete(parser);
+
+    if (lexer)
+        ksv_lexer_delete(lexer);
+
+    if (line)
+        free(line);
+
+    return ksv_status;
+}
+
 static KSV_STATUS ksv_header_expand(ksv_t *self);
 
 static KSV_STATUS ksv_header_push(ksv_t *self, char *field)

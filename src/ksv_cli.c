@@ -9,6 +9,11 @@
 
 KSV_STATUS show_sheet(FILE *stream, ksv_t *ksv);
 
+#define CHECK_DIMENSION(cmd) \
+    ((cmd) == KSV_COMMAND_WIDTH \
+     || (cmd) == KSV_COMMAND_HEIGHT \
+     || (cmd) == KSV_COMMAND_DIMENSION)
+
 int main(int argc, char *argv[])
 {
     if (argc < 2) {
@@ -68,7 +73,41 @@ int main(int argc, char *argv[])
     PUTERR("CSV dimension (col, row): (%lu, %lu)", ksv_col(ksv), ksv_row(ksv));
 #endif
 
-    if (KSV_COMMAND_HEADER == ksv_argument_command(arg)) {
+    if (CHECK_DIMENSION(ksv_argument_command(arg))) {
+        if (KSV_SUCCESS != ksv_load_header(ksv, fp))
+            goto ERROR_KSV;
+
+        size_t width = ksv_col(ksv);
+        size_t height = 0;
+        while (!feof(fp)) {
+            if (KSV_SUCCESS != ksv_load_record(ksv, fp))
+                goto ERROR_KSV;
+
+            if (width != ksv_col(ksv)) {
+                PUTERR("Unequal sheet width after row %lu", height);
+                goto ERROR_KSV;
+            }
+
+            height += 1;
+        }
+
+        if (IS_KSV_COMMAND_EQUAL(
+            KSV_COMMAND_WIDTH, 
+            ksv_argument_command(arg))) {
+            PUTS("%lu", width);
+        }
+        else if (IS_KSV_COMMAND_EQUAL(
+            KSV_COMMAND_HEIGHT,
+            ksv_argument_command(arg))) {
+            PUTS("%lu", height);
+        }
+        else if (IS_KSV_COMMAND_EQUAL(
+            KSV_COMMAND_DIMENSION,
+            ksv_argument_command(arg))) {
+            PUTS("%lu %lu", width, height);
+        }
+    }
+    else if (KSV_COMMAND_HEADER == ksv_argument_command(arg)) {
         if (KSV_SUCCESS != ksv_load_header(ksv, fp))
             goto ERROR_KSV;
 

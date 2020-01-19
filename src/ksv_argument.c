@@ -33,6 +33,15 @@ ksv_argument_t * ksv_argument_parse(int argc, char *argv[])
                 arg->command = KSV_COMMAND_HELP;
                 break;
             }
+            else if (0 == strcmp("width", argv[i])) {
+                arg->command = KSV_COMMAND_WIDTH;
+            }
+            else if (0 == strcmp("height", argv[i])) {
+                arg->command = KSV_COMMAND_HEIGHT;
+            }
+            else if (0 == strcmp("dimension", argv[i])) {
+                arg->command = KSV_COMMAND_DIMENSION;
+            }
             else if (0 == strcmp("header", argv[i])) {
                 arg->command = KSV_COMMAND_HEADER;
             }
