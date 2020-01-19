@@ -114,7 +114,7 @@ else
 ifeq ($(detected_OS),Darwin)
 	libtool -static -o ..$(SEP)$(DIST_DIR)$(SEP)$(LIB_STATIC) $(OBJS)
 else
-	$(AR) rcs $(LIB_STATIC) $(OBJS)
+	$(AR) rcs ..$(SEP)$(DIST_DIR)$(SEP)$(LIB_STATIC) $(OBJS)
 endif
 endif
 
