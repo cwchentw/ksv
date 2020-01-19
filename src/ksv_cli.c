@@ -123,7 +123,7 @@ KSV_STATUS show_sheet(FILE *stream, ksv_t *ksv)
             if (ksv_has_header(ksv)) {
                 char *header = ksv_next_header(ksv);
                 sz = sz > strlen(header) ? sz : strlen(header);
-            }            
+            }
 
             char *field = ksv_next_data_by_column(ksv);
         #if DEBUG
@@ -295,7 +295,7 @@ KSV_STATUS show_sheet(FILE *stream, ksv_t *ksv)
 
                     line[temp+strlen(field)] = '|';
                     line[temp+strlen(field)+1] = '\0';
-                
+
                 #if DEBUG
                     PUTERR("Line: -->%s<--", line);
                 #endif
