@@ -56,7 +56,7 @@ typedef struct ksv_t ksv_t;
 
 #if _MSC_VER
     #ifndef KSV_IMPORT_SYMBOLS
-        #define KSV_EXPORT_SYMBOLS
+        #define KSV_EXPORT_SYMBOLS 1
     #endif
 #endif
 
