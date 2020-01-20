@@ -48,25 +48,49 @@ typedef unsigned char KSV_STATUS;
 
 typedef struct ksv_t ksv_t;
 
+#if _MSC_VER
+    #ifndef KSV_IMPORT_SYMBOLS
+        #define KSV_PUBLIC_SYMBOLS
+    #endif
+#endif
+
+#if _MSC_VER
+    #if KSV_IMPORT_SYMBOLS
+        #define KSV_PUBLIC __declspec(dllimport)
+    #elif KSV_PUBLIC_SYMBOLS
+        #define KSV_PUBLIC __declspec(dllexpoet)
+    #endif
+#elif __GNUC__ >= 4 || __clang__
+    #define KSV_PUBLIC __attribute__((__visibility__("default")))
+#else
+    #define KSV_PUBLIC
+#endif
+
+#if __GNUC__ >= 4
+    #define KSV_PRIVATE  __attribute__ ((visibility ("hidden")))
+#else
+    #define KSV_PRIVATE
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-ksv_t * ksv_new_default(void);
-ksv_t * ksv_new(char *delimeter, char *end_of_line, char *quote);
-void ksv_delete(void *self);
-KSV_STATUS ksv_load_table_with_header_strictly(ksv_t *self, FILE *stream);
-KSV_STATUS ksv_load_header(ksv_t *self, FILE *stream);
-KSV_STATUS ksv_load_record(ksv_t *self, FILE *stream);
-BOOL ksv_has_header(ksv_t *self);
-size_t ksv_row(ksv_t *self);
-size_t ksv_col(ksv_t *self);
-void ksv_restart(ksv_t *self);
-char * ksv_next_header(ksv_t *self);
-BOOL ksv_next_column(ksv_t *self);
-char * ksv_next_data_by_column(ksv_t *self);
-BOOL ksv_next_row(ksv_t *self);
-char * ksv_next_data_by_row(ksv_t *self);
+KSV_PUBLIC ksv_t * ksv_new_default(void);
+KSV_PUBLIC ksv_t * ksv_new(char *delimeter, char *end_of_line, char *quote);
+KSV_PUBLIC void ksv_delete(void *self);
+KSV_PUBLIC KSV_STATUS ksv_load_table_with_header_strictly(ksv_t *self, FILE *stream);
+KSV_PUBLIC KSV_STATUS ksv_load_header(ksv_t *self, FILE *stream);
+KSV_PUBLIC KSV_STATUS ksv_load_record(ksv_t *self, FILE *stream);
+KSV_PUBLIC BOOL ksv_has_header(ksv_t *self);
+KSV_PUBLIC size_t ksv_row(ksv_t *self);
+KSV_PUBLIC size_t ksv_col(ksv_t *self);
+KSV_PUBLIC void ksv_restart(ksv_t *self);
+KSV_PUBLIC char * ksv_next_header(ksv_t *self);
+KSV_PUBLIC BOOL ksv_next_column(ksv_t *self);
+KSV_PUBLIC char * ksv_next_data_by_column(ksv_t *self);
+KSV_PUBLIC BOOL ksv_next_row(ksv_t *self);
+KSV_PUBLIC char * ksv_next_data_by_row(ksv_t *self);
 
 #ifdef __cplusplus
 }

@@ -11,10 +11,10 @@ typedef unsigned char KSV_AST_TYPE;
 #define  KSV_AST_DELIMITER  1
 #define  KSV_AST_EOL        2
 
-ksv_ast_t * ksv_ast_new(KSV_AST_TYPE type);
-void ksv_ast_delete(void *self);
-KSV_STATUS ksv_ast_add_token(ksv_ast_t *self, ksv_token_t *token);
-KSV_AST_TYPE ksv_ast_type(ksv_ast_t *self);
-char * ksv_ast_string(ksv_ast_t *self);
+KSV_PRIVATE ksv_ast_t * ksv_ast_new(KSV_AST_TYPE type);
+KSV_PRIVATE void ksv_ast_delete(void *self);
+KSV_PRIVATE KSV_STATUS ksv_ast_add_token(ksv_ast_t *self, ksv_token_t *token);
+KSV_PRIVATE KSV_AST_TYPE ksv_ast_type(ksv_ast_t *self);
+KSV_PRIVATE char * ksv_ast_string(ksv_ast_t *self);
 
 #endif  /* KSV_AST_H */

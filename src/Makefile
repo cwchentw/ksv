@@ -49,7 +49,7 @@ ifeq ($(detected_OS),Darwin)
 else
 	LIB_DYNAMIC=libksv.so
 endif
-	CFLAGS=-Wall -Wextra -std=c89
+	CFLAGS=-Wall -Wextra -std=c89 -fvisibility=hidden
 endif
 
 ifneq (,$(DEBUG))
