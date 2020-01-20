@@ -89,22 +89,7 @@ endif
 
 .PHONY: all dynamic static exec clean_obj clean
 
-all:
-	$(MAKE) dynamic
-	$(MAKE) clean_obj
-	$(MAKE) static
-	$(MAKE) exec
-
-exec: $(TARGET)
-
-$(TARGET): $(LIB_STATIC) $(EXEC_OBJS)
-ifneq (,$(findstring $(CC),$(CL)))
-	$(CC) /Fe:..$(SEP)$(DIST_DIR)$(SEP)$(TARGET) $(EXEC_OBJS) \
-		..$(SEP)$(DIST_DIR)$(SEP)$(LIB_STATIC) $(CFLAGS)
-else
-	$(CC) -o ..$(SEP)$(DIST_DIR)$(SEP)$(TARGET) $(EXEC_OBJS) \
-		..$(SEP)$(DIST_DIR)$(SEP)$(LIB_STATIC) $(CFLAGS)
-endif
+all: dynamic
 
 dynamic: $(LIB_DYNAMIC)
 
@@ -126,6 +111,17 @@ ifeq ($(detected_OS),Darwin)
 else
 	$(AR) rcs ..$(SEP)$(DIST_DIR)$(SEP)$(LIB_STATIC) $(OBJS)
 endif
+endif
+
+exec: $(TARGET)
+
+$(TARGET): $(LIB_STATIC) $(EXEC_OBJS)
+ifneq (,$(findstring $(CC),$(CL)))
+	$(CC) /Fe:..$(SEP)$(DIST_DIR)$(SEP)$(TARGET) $(EXEC_OBJS) \
+		..$(SEP)$(DIST_DIR)$(SEP)$(LIB_STATIC) $(CFLAGS)
+else
+	$(CC) -o ..$(SEP)$(DIST_DIR)$(SEP)$(TARGET) $(EXEC_OBJS) \
+		..$(SEP)$(DIST_DIR)$(SEP)$(LIB_STATIC) $(CFLAGS)
 endif
 
 %.obj: %.c
