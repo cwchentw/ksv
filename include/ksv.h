@@ -7,6 +7,30 @@
 #define  KSV_VERSION_MINOR  1
 #define  KSV_VERSION_PATCH  0
 
+#if _MSC_VER
+    #if KSV_IMPORT_SYMBOLS
+        #define KSV_PUBLIC __declspec(dllimport)
+    #elif KSV_EXPORT_SYMBOLS
+        #define KSV_PUBLIC __declspec(dllexport)
+    #else
+        #define KSV_PUBLIC
+    #endif
+#elif __GNUC__ >= 4 || __clang__
+    #define KSV_PUBLIC __attribute__((__visibility__("default")))
+#else
+    #define KSV_PUBLIC
+#endif
+
+#if __GNUC__ >= 4 || __clang__
+    #define KSV_PRIVATE __attribute__((__visibility__("hidden")))
+#else
+    #define KSV_PRIVATE
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef __cplusplus
     #include <cstdio>
 #else
@@ -52,31 +76,7 @@ typedef unsigned char KSV_STATUS;
 #define  KSV_ERROR_PARSING  4
 #define  KSV_INVALID_FILE   5
 
-typedef struct ksv_t ksv_t;
-
-#if _MSC_VER
-    #if KSV_IMPORT_SYMBOLS
-        #define KSV_PUBLIC __declspec(dllimport)
-    #elif KSV_EXPORT_SYMBOLS
-        #define KSV_PUBLIC __declspec(dllexport)
-    #else
-        #define KSV_PUBLIC
-    #endif
-#elif __GNUC__ >= 4 || __clang__
-    #define KSV_PUBLIC __attribute__((__visibility__("default")))
-#else
-    #define KSV_PUBLIC
-#endif
-
-#if __GNUC__ >= 4 || __clang__
-    #define KSV_PRIVATE __attribute__((__visibility__("hidden")))
-#else
-    #define KSV_PRIVATE
-#endif
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+typedef struct KSV_PUBLIC ksv_t ksv_t;
 
 KSV_PUBLIC ksv_t * ksv_new_default(void);
 KSV_PUBLIC ksv_t * ksv_new(char *delimeter, char *end_of_line, char *quote);
