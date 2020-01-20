@@ -26,17 +26,7 @@ struct ksv_t {
 
 ksv_t * ksv_new_default(void)
 {
-#ifndef END_OF_LINE
-    #ifdef _WIN32
-        #define END_OF_LINE "\r\n"
-    #elif __unix__ || __APPLE__
-        #define END_OF_LINE "\n"
-    #else
-        #error "Unsupported platform"
-    #endif
-#endif  /* END_OF_LINE */
-
-    return ksv_new(",", END_OF_LINE, "\"");
+    return ksv_new(",", "\n", "\"");
 }
 
 ksv_t * ksv_new(char *delimeter, char *end_of_line, char *quote)
