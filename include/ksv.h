@@ -50,14 +50,14 @@ typedef struct ksv_t ksv_t;
 
 #if _MSC_VER
     #ifndef KSV_IMPORT_SYMBOLS
-        #define KSV_PUBLIC_SYMBOLS
+        #define KSV_EXPORT_SYMBOLS
     #endif
 #endif
 
 #if _MSC_VER
     #if KSV_IMPORT_SYMBOLS
         #define KSV_PUBLIC __declspec(dllimport)
-    #elif KSV_PUBLIC_SYMBOLS
+    #elif KSV_EXPORT_SYMBOLS
         #define KSV_PUBLIC __declspec(dllexpoet)
     #endif
 #elif __GNUC__ >= 4 || __clang__
@@ -67,7 +67,7 @@ typedef struct ksv_t ksv_t;
 #endif
 
 #if __GNUC__ >= 4
-    #define KSV_PRIVATE  __attribute__ ((visibility ("hidden")))
+    #define KSV_PRIVATE  __attribute__ ((__visibility__("hidden")))
 #else
     #define KSV_PRIVATE
 #endif
