@@ -357,6 +357,12 @@ KSV_STATUS ksv_load_header(ksv_t *self, FILE *stream)
     if (!(self->header))
         return KSV_NO_MEMORY;
 
+    {
+        size_t i;
+        for (i = 0; i < self->capacity_header; ++i)
+            self->header[i] = NULL;
+    }
+
     char *line = NULL;
     ksv_lexer_t *lexer = NULL;
     ksv_parser_t *parser = NULL;
@@ -370,6 +376,8 @@ KSV_STATUS ksv_load_header(ksv_t *self, FILE *stream)
     #endif
         return KSV_NO_MEMORY;
     }
+
+    line[0] = '\0';
 
     KSV_STATUS ksv_status = KSV_FAILURE;
     while (fgets(line, line_width, stream)) {
