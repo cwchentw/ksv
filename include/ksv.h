@@ -1,6 +1,12 @@
 #ifndef KSV_H
 #define KSV_H
 
+#define  KSV_VERSION  "0.1.0"
+
+#define  KSV_VERSION_MAJOR  0
+#define  KSV_VERSION_MINOR  1
+#define  KSV_VERSION_PATCH  0
+
 #ifdef __cplusplus
     #include <cstdio>
 #else
