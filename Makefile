@@ -16,8 +16,7 @@ EXAMPLE_DIR=example
 
 .PHONY: all example dynamic static exec clean
 
-all:
-	$(MAKE) -C .$(SEP)$(SRC_DIR)
+all: dynamic
 
 example:
 	$(MAKE) -C .$(SEP)$(SRC_DIR) dynamic

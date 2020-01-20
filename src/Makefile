@@ -52,6 +52,12 @@ endif
 	CFLAGS=-Wall -Wextra -std=c89 -fvisibility=hidden
 endif
 
+ifeq ($(MAKECMDGOALS),dynamic)
+ifneq (,$(findstring $(CC),$(CL)))
+	CFLAGS+=/DKSV_EXPORT_SYMBOLS
+endif
+endif
+
 ifneq (,$(DEBUG))
 ifneq (,$(findstring $(CC),$(CL)))
 	CFLAGS+=/D DEBUG
@@ -135,4 +141,5 @@ clean:
 	$(RM) $(OBJS) $(EXEC_OBJS) \
 	..$(SEP)$(DIST_DIR)$(SEP)$(LIB_DYNAMIC) \
 	..$(SEP)$(DIST_DIR)$(SEP)$(LIB_STATIC) \
-	..$(SEP)$(DIST_DIR)$(SEP)$(TARGET)
+	..$(SEP)$(DIST_DIR)$(SEP)$(TARGET) \
+	..$(SEP)$(DIST_DIR)$(SEP)*.exp
