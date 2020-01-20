@@ -58,10 +58,14 @@ endif
 .PHONY: example clean
 
 example: $(EXEC_CSV_TO_TSV)
-ifeq ($(detected_OS),Linux)
-	LD_LIBRARY_PATH=. .$(SEP)$(EXEC_CSV_TO_TSV) ..$(SEP)$(DATA_DIR)$(SEP)iris.csv
+ifeq ($(detected_OS),Windows)
+        .$(SEP)$(EXEC_CSV_TO_TSV) ..$(SEP)$(DATA_DIR)$(SEP)iris.csv
 else
-	.$(SEP)$(EXEC_CSV_TO_TSV) ..$(SEP)$(DATA_DIR)$(SEP)iris.csv
+ifeq ($(detected_OS),Darwin)
+        .$(SEP)$(EXEC_CSV_TO_TSV) ..$(SEP)$(DATA_DIR)$(SEP)iris.csv
+else
+	LD_LIBRARY_PATH=. .$(SEP)$(EXEC_CSV_TO_TSV) ..$(SEP)$(DATA_DIR)$(SEP)iris.csv
+endif
 endif
 
 $(EXEC_CSV_TO_TSV): $(OBJS_CSV_TO_TSV)
