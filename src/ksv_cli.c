@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
     if (!ksv)
         goto ERROR_KSV;
 
-    
+
 
 #if DEBUG
     PUTERR("CSV dimension (col, row): (%lu, %lu)", ksv_col(ksv), ksv_row(ksv));
@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
         }
 
         if (IS_KSV_COMMAND_EQUAL(
-            KSV_COMMAND_WIDTH, 
+            KSV_COMMAND_WIDTH,
             ksv_argument_command(arg))) {
             PUTS("%lu", width);
         }

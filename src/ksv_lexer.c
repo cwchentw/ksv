@@ -88,55 +88,30 @@ KSV_STATUS ksv_lexer_lex(ksv_lexer_t *self, char *input)
         size_t i;
         size_t j;
         for (i = 0; i < strlen(input); i++) {
-            if ('\n' == input[i]) {
-                if (0 == strcmp("\n", self->end_of_line)) {
-                    char *eol = string_allocate("\n");
-                    if (!eol)
-                        return KSV_NO_MEMORY;
-
-                #if DEBUG
-                    PUTERR("EOL as token: -->%s<--", eol);
-                #endif
-
-                    ksv_token_t *token = \
-                        ksv_token_new(KSV_TOKEN_END_OF_LINE, eol);
-                    if (!token)
-                        return KSV_NO_MEMORY;
-
-                    KSV_STATUS s = ksv_lexer_push(self, token);
-                    if (KSV_SUCCESS != s)
-                        return s;
+            if (self->end_of_line[0] == input[i]) {
+                for (j = 0; j < strlen(self->end_of_line) && i+j < strlen(input); j++) {
+                    if (self->end_of_line[j] != input[i+j])
+                        goto LEX_STRING;
                 }
-                else {
-                    goto LEX_STRING;
-                }
-            }
-            else if ('\r' == input[i]) {
-                if (0 == strcmp("\r\n", self->end_of_line)) {
-                    if (i+1 < strlen(input) && '\n' == input[i+1]) {
-                        char *eol = string_allocate("\r\n");
-                        if (!eol)
-                            return KSV_NO_MEMORY;
 
-                    #if DEBUG
-                        PUTERR("EOL as token: -->%s<--", eol);
-                    #endif
+                char *eol = string_allocate("\r\n");
+                if (!eol)
+                    return KSV_NO_MEMORY;
 
-                        ksv_token_t *token = \
-                            ksv_token_new(KSV_TOKEN_END_OF_LINE, eol);
-                        if (!token)
-                            return KSV_NO_MEMORY;
+            #if DEBUG
+                PUTERR("EOL as token: -->%s<--", eol);
+            #endif
 
-                        KSV_STATUS s = ksv_lexer_push(self, token);
-                        if (KSV_SUCCESS != s)
-                            return s;
+                ksv_token_t *token = \
+                    ksv_token_new(KSV_TOKEN_END_OF_LINE, eol);
+                if (!token)
+                    return KSV_NO_MEMORY;
 
-                        i += 1;
-                    }
-                }
-                else {
-                    goto LEX_STRING;
-                }
+                KSV_STATUS s = ksv_lexer_push(self, token);
+                if (KSV_SUCCESS != s)
+                    return s;
+
+                i += 1;
             }
             else if (self->quote[0] == input[i]) {
                 for (j = 0; j < strlen(self->quote) && i+j < strlen(input); j++) {
@@ -189,16 +164,18 @@ KSV_STATUS ksv_lexer_lex(ksv_lexer_t *self, char *input)
             else {
             LEX_STRING:
                 for (j = i; j < strlen(input); j++) {
-                    if (0 == strcmp("\n", self->end_of_line) && '\n' == input[j])
-                        break;
-
-                    if (0 == strcmp("\r\n", self->end_of_line)
-                        && '\r' == input[j]
-                        && j+1 < strlen(input)
-                        && '\n' == input[j+1])
-                        break;
-
                     size_t k;
+                    BOOL is_eol = TRUE;
+                    for (k = 0; k < strlen(self->end_of_line) && j+k < strlen(input); k++) {
+                        if (self->end_of_line[k] != input[j+k]) {
+                            is_eol = FALSE;
+                            break;
+                        }
+                    }
+
+                    if (is_eol)
+                        break;
+
                     BOOL is_quote = TRUE;
                     for (k = 0; k < strlen(self->quote) && j+k < strlen(input); k++) {
                         if (self->quote[k] != input[j+k]) {
@@ -207,10 +184,8 @@ KSV_STATUS ksv_lexer_lex(ksv_lexer_t *self, char *input)
                         }
                     }
 
-                    if (is_quote) {
-                        j += k - 1;
+                    if (is_quote)
                         break;
-                    }
 
                     BOOL is_delim = TRUE;
                     for (k = 0; k < strlen(self->delimeter) && j+k < strlen(input); k++) {
@@ -220,10 +195,8 @@ KSV_STATUS ksv_lexer_lex(ksv_lexer_t *self, char *input)
                         }
                     }
 
-                    if (is_delim) {
-                        j += k - 1;
+                    if (is_delim)
                         break;
-                    }
                 }
 
                 char *s = string_allocate_substring(input, i, j - 1);
