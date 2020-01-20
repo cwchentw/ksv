@@ -66,8 +66,8 @@ typedef struct ksv_t ksv_t;
     #define KSV_PUBLIC
 #endif
 
-#if __GNUC__ >= 4
-    #define KSV_PRIVATE  __attribute__((__visibility__("hidden")))
+#if __GNUC__ >= 4 || __clang__
+    #define KSV_PRIVATE __attribute__((__visibility__("hidden")))
 #else
     #define KSV_PRIVATE
 #endif
