@@ -41,7 +41,7 @@ CL := cl icl
 ifneq (,$(findstring $(CC),$(CL)))
 	LIB_STATIC=ksv.lib
 	LIB_DYNAMIC=ksv.dll
-	CFLAGS=/W4 /sdl /D_CRT_SECURE_NO_WARNINGS
+	CFLAGS=/W4 /sdl /D_CRT_SECURE_NO_WARNINGS /Za /GS
 else
 	LIB_STATIC=libksv.a
 ifeq ($(detected_OS),Darwin)
@@ -59,8 +59,8 @@ endif
 ifeq ($(MAKECMDGOALS),dynamic)
 ifneq (,$(findstring $(CC),$(CL)))
 	CFLAGS+=/DKSV_EXPORT_SYMBOLS
-endif
-endif
+endif  # CL
+endif  # dynamic
 
 ifneq (,$(DEBUG))
 ifneq (,$(findstring $(CC),$(CL)))
