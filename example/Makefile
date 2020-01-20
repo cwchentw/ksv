@@ -36,9 +36,10 @@ else
 endif
 
 ifneq (,$(findstring $(CC),$(CL)))
+	LIB_EXPORT=ksv.exp
 	LIB_STATIC=ksv.lib
 	LIB_DYNAMIC=ksv.dll
-	CFLAGS=/W4 /sdl /D_CRT_SECURE_NO_WARNINGS
+	CFLAGS=/W4 /sdl /D_CRT_SECURE_NO_WARNINGS /DKSV_IMPORT_SYMBOLS
 else
 	LIB_STATIC=libksv.a
 ifeq ($(detected_OS),Darwin)
@@ -65,20 +66,21 @@ endif
 
 $(EXEC_CSV_TO_TSV): $(OBJS_CSV_TO_TSV)
 ifneq (,$(findstring $(CC),$(CL)))
+	$(CP) ..$(SEP)$(DIST_DIR)$(SEP)$(LIB_EXPORT) .
 	$(CP) ..$(SEP)$(DIST_DIR)$(SEP)$(LIB_STATIC) .
 	$(CP) ..$(SEP)$(DIST_DIR)$(SEP)$(LIB_DYNAMIC) .
-	$(CC) /Fe:$(EXEC_CSV_TO_TSV) $(OBJS_CSV_TO_TSV) $(LIB_STATIC)
+	$(CC) /Fe:$(EXEC_CSV_TO_TSV) $(OBJS_CSV_TO_TSV) $(LIB_STATIC) $(LIB_EXPORT) $(CFLAGS)
 else
 	$(CP) ..$(SEP)$(DIST_DIR)$(SEP)$(LIB_DYNAMIC) .
-	$(CC) -o $(EXEC_CSV_TO_TSV) $(OBJS_CSV_TO_TSV) $(LIB_DYNAMIC)
+	$(CC) -o $(EXEC_CSV_TO_TSV) $(OBJS_CSV_TO_TSV) $(LIB_DYNAMIC) $(CFLAGS)
 endif
 
 %.obj: %.c
-	$(CC) /c $< $(CFLAGS) /I..$(SEP)$(INCLUDE_DIR)
+	$(CC) /c $< /I..$(SEP)$(INCLUDE_DIR) $(CFLAGS)
 
 %.o: %.c
-	$(CC) -c $< $(CFLAGS) -I ..$(SEP)$(INCLUDE_DIR)
+	$(CC) -c $< -I ..$(SEP)$(INCLUDE_DIR) $(CFLAGS)
 
 clean:
 	$(RM) $(EXEC_CSV_TO_TSV) $(OBJS_CSV_TO_TSV) \
-		$(LIB_DYNAMIC) $(LIB_STATIC)
+		$(LIB_DYNAMIC) $(LIB_STATIC) $(LIB_EXPORT)
