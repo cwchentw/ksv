@@ -24,12 +24,12 @@ struct ksv_t {
     char *quote;
 };
 
-KSV_PUBLIC ksv_t * ksv_new_default(void)
+ksv_t * ksv_new_default(void)
 {
     return ksv_new(",", "\n", "\"");
 }
 
-KSV_PUBLIC ksv_t * ksv_new(char *delimeter, char *end_of_line, char *quote)
+ksv_t * ksv_new(char *delimeter, char *end_of_line, char *quote)
 {
     assert(delimeter && 0 != strcmp("", delimeter));
     assert(end_of_line && 0 != strcmp("", end_of_line));
@@ -64,7 +64,7 @@ KSV_PUBLIC ksv_t * ksv_new(char *delimeter, char *end_of_line, char *quote)
     return csv;
 }
 
-KSV_PUBLIC void ksv_delete(void *self)
+void ksv_delete(void *self)
 {
     assert(self);
 
@@ -97,28 +97,28 @@ KSV_PUBLIC void ksv_delete(void *self)
     free(self);
 }
 
-KSV_PUBLIC BOOL ksv_has_header(ksv_t *self)
+BOOL ksv_has_header(ksv_t *self)
 {
     assert(self);
 
     return self->header ? TRUE : FALSE;
 }
 
-KSV_PUBLIC size_t ksv_row(ksv_t *self)
+size_t ksv_row(ksv_t *self)
 {
     assert(self);
 
     return self->row;
 }
 
-KSV_PUBLIC size_t ksv_col(ksv_t *self)
+size_t ksv_col(ksv_t *self)
 {
     assert(self);
 
     return self->col;
 }
 
-KSV_PUBLIC void ksv_restart(ksv_t *self)
+void ksv_restart(ksv_t *self)
 {
     assert(self);
 
@@ -127,7 +127,7 @@ KSV_PUBLIC void ksv_restart(ksv_t *self)
     self->index_row = 0;
 }
 
-KSV_PUBLIC char * ksv_next_header(ksv_t *self)
+char * ksv_next_header(ksv_t *self)
 {
     assert(self);
 
@@ -143,7 +143,7 @@ KSV_PUBLIC char * ksv_next_header(ksv_t *self)
     return header;
 }
 
-KSV_PUBLIC BOOL ksv_next_column(ksv_t *self)
+BOOL ksv_next_column(ksv_t *self)
 {
     assert(self);
 
@@ -156,7 +156,7 @@ KSV_PUBLIC BOOL ksv_next_column(ksv_t *self)
     return TRUE;
 }
 
-KSV_PUBLIC char * ksv_next_data_by_column(ksv_t *self)
+char * ksv_next_data_by_column(ksv_t *self)
 {
     assert(self);
 
@@ -171,7 +171,7 @@ KSV_PUBLIC char * ksv_next_data_by_column(ksv_t *self)
     return field;
 }
 
-KSV_PUBLIC BOOL ksv_next_row(ksv_t *self)
+BOOL ksv_next_row(ksv_t *self)
 {
     assert(self);
 
@@ -184,7 +184,7 @@ KSV_PUBLIC BOOL ksv_next_row(ksv_t *self)
     return TRUE;
 }
 
-KSV_PUBLIC char * ksv_next_data_by_row(ksv_t *self)
+char * ksv_next_data_by_row(ksv_t *self)
 {
     assert(self);
 
@@ -202,7 +202,7 @@ KSV_PUBLIC char * ksv_next_data_by_row(ksv_t *self)
 static KSV_STATUS ksv_header_push(ksv_t *self, char *field);
 static KSV_STATUS ksv_rows_push(ksv_t *self, char *field);
 
-KSV_PUBLIC KSV_STATUS ksv_load_table_with_header_strictly(ksv_t *self, FILE *stream)
+KSV_STATUS ksv_load_table_with_header_strictly(ksv_t *self, FILE *stream)
 {
     assert(self);
 
@@ -348,7 +348,7 @@ ERROR_CSV:
     return ksv_status;
 }
 
-KSV_PUBLIC KSV_STATUS ksv_load_header(ksv_t *self, FILE *stream)
+KSV_STATUS ksv_load_header(ksv_t *self, FILE *stream)
 {
     assert(self);
 
@@ -482,7 +482,7 @@ ERROR_CSV:
     return ksv_status;
 }
 
-KSV_PUBLIC KSV_STATUS ksv_load_record(ksv_t *self, FILE *stream)
+KSV_STATUS ksv_load_record(ksv_t *self, FILE *stream)
 {
     assert(self);
 
