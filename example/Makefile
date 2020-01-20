@@ -7,6 +7,8 @@ endif
 ifeq ($(detected_OS),Windows)
 	RM=del /q /f
 	CP=copy
+else
+	CP=cp -f
 endif
 
 ifeq ($(detected_OS),Windows)
@@ -55,7 +57,11 @@ endif
 .PHONY: example clean
 
 example: $(EXEC_CSV_TO_TSV)
+ifeq ($(detected_OS),Linux)
+	LD_LIBRARY_PATH=. .$(SEP)$(EXEC_CSV_TO_TSV) ..$(SEP)$(DATA_DIR)$(SEP)iris.csv
+else
 	.$(SEP)$(EXEC_CSV_TO_TSV) ..$(SEP)$(DATA_DIR)$(SEP)iris.csv
+endif
 
 $(EXEC_CSV_TO_TSV): $(OBJS_CSV_TO_TSV)
 ifneq (,$(findstring $(CC),$(CL)))

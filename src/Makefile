@@ -103,7 +103,7 @@ ifneq (,$(findstring $(CC),$(CL)))
 		..$(SEP)$(DIST_DIR)$(SEP)$(LIB_STATIC) $(CFLAGS)
 else
 	$(CC) -o ..$(SEP)$(DIST_DIR)$(SEP)$(TARGET) $(EXEC_OBJS) \
-		..$(SEP)$(DIST_DIR)$(SEP)$(LIB_DYNAMIC) $(CFLAGS)
+		..$(SEP)$(DIST_DIR)$(SEP)$(LIB_STATIC) $(CFLAGS)
 endif
 
 dynamic: $(LIB_DYNAMIC)
