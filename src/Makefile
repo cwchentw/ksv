@@ -47,7 +47,11 @@ else
 ifeq ($(detected_OS),Darwin)
 	LIB_DYNAMIC=libksv.dylib
 else
+ifeq ($(detected_OS),Windows)
+	LIB_DYNAMIC=libksv.dll
+else
 	LIB_DYNAMIC=libksv.so
+endif
 endif
 	CFLAGS=-Wall -Wextra -std=c89 -fvisibility=hidden
 endif
@@ -99,7 +103,7 @@ ifneq (,$(findstring $(CC),$(CL)))
 		..$(SEP)$(DIST_DIR)$(SEP)$(LIB_STATIC) $(CFLAGS)
 else
 	$(CC) -o ..$(SEP)$(DIST_DIR)$(SEP)$(TARGET) $(EXEC_OBJS) \
-		..$(SEP)$(DIST_DIR)$(SEP)$(LIB_STATIC) $(CFLAGS)
+		..$(SEP)$(DIST_DIR)$(SEP)$(LIB_DYNAMIC) $(CFLAGS)
 endif
 
 dynamic: $(LIB_DYNAMIC)

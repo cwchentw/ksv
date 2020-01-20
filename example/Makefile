@@ -6,6 +6,7 @@ endif
 
 ifeq ($(detected_OS),Windows)
 	RM=del /q /f
+	CP=copy
 endif
 
 ifeq ($(detected_OS),Windows)
@@ -41,7 +42,11 @@ else
 ifeq ($(detected_OS),Darwin)
 	LIB_DYNAMIC=libksv.dylib
 else
+ifeq ($(detected_OS),Windows)
+	LIB_DYNAMIC=libksv.dll
+else
 	LIB_DYNAMIC=libksv.so
+endif
 endif
 	CFLAGS=-Wall -Wextra -std=c89
 endif
@@ -50,18 +55,17 @@ endif
 .PHONY: example clean
 
 example: $(EXEC_CSV_TO_TSV)
-ifeq ($(detected_OS),Windows)
-	copy ..$(SEP)$(DIST_DIR)$(SEP)$(LIB_DYNAMIC) .
-endif
+
 	.$(SEP)$(EXEC_CSV_TO_TSV) ..$(SEP)$(DATA_DIR)$(SEP)iris.csv
 
 $(EXEC_CSV_TO_TSV): $(OBJS_CSV_TO_TSV)
 ifneq (,$(findstring $(CC),$(CL)))
-	$(CC) /Fe:$(EXEC_CSV_TO_TSV) $(OBJS_CSV_TO_TSV) \
-		..$(SEP)$(DIST_DIR)$(SEP)$(LIB_STATIC)
+	$(CP) ..$(SEP)$(DIST_DIR)$(SEP)$(LIB_STATIC) .
+	$(CP) ..$(SEP)$(DIST_DIR)$(SEP)$(LIB_DYNAMIC) .
+	$(CC) /Fe:$(EXEC_CSV_TO_TSV) $(OBJS_CSV_TO_TSV) $(LIB_STATIC)
 else
-	$(CC) -o $(EXEC_CSV_TO_TSV) $(OBJS_CSV_TO_TSV) \
-		..$(SEP)$(DIST_DIR)$(SEP)$(LIB_DYNAMIC)
+	$(CP) ..$(SEP)$(DIST_DIR)$(SEP)$(LIB_DYNAMIC) .
+	$(CC) -o $(EXEC_CSV_TO_TSV) $(OBJS_CSV_TO_TSV) $(LIB_DYNAMIC)
 endif
 
 %.obj: %.c
