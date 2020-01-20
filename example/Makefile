@@ -55,7 +55,6 @@ endif
 .PHONY: example clean
 
 example: $(EXEC_CSV_TO_TSV)
-
 	.$(SEP)$(EXEC_CSV_TO_TSV) ..$(SEP)$(DATA_DIR)$(SEP)iris.csv
 
 $(EXEC_CSV_TO_TSV): $(OBJS_CSV_TO_TSV)
@@ -75,4 +74,5 @@ endif
 	$(CC) -c $< $(CFLAGS) -I ..$(SEP)$(INCLUDE_DIR)
 
 clean:
-	$(RM) $(EXEC_CSV_TO_TSV) $(OBJS_CSV_TO_TSV) $(LIB_DYNAMIC)
+	$(RM) $(EXEC_CSV_TO_TSV) $(OBJS_CSV_TO_TSV) \
+		$(LIB_DYNAMIC) $(LIB_STATIC)
