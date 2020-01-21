@@ -98,7 +98,7 @@ ifneq (,$(findstring $(CC),$(CL)))
 	$(CP) ..$(SEP)$(DIST_DIR)$(SEP)$(LIB_EXPORT_CPP) .
 	$(CP) ..$(SEP)$(DIST_DIR)$(SEP)$(LIB_STATIC_CPP) .
 	$(CP) ..$(SEP)$(DIST_DIR)$(SEP)$(LIB_DYNAMIC_CPP) .
-	$(CXX) /Fe:$(EXEC_CSV_TO_TSV_CPP) $(OBJS_CSV_TO_TSV_CPP) $(LIB_STATIC_CPP) $(LIB_EXPORT_CPP) $(CXXFLAGS)
+	$(CC) /Fe:$(EXEC_CSV_TO_TSV_CPP) $(OBJS_CSV_TO_TSV_CPP) $(LIB_STATIC_CPP) $(LIB_EXPORT_CPP) $(CXXFLAGS) /EHsc
 else
 	$(CP) ..$(SEP)$(DIST_DIR)$(SEP)$(LIB_DYNAMIC_CPP) .
 	$(CXX) -o $(EXEC_CSV_TO_TSV_CPP) $(OBJS_CSV_TO_TSV_CPP) $(LIB_DYNAMIC_CPP) $(CXXFLAGS)
@@ -108,7 +108,7 @@ endif
 	$(CC) /c $< /I..$(SEP)$(INCLUDE_DIR) $(CFLAGS)
 
 %.obj: %.cpp
-	$(CC) /c $< /I..$(SEP)$(INCLUDE_DIR) $(CXXFLAGS)
+	$(CC) /c $< /I..$(SEP)$(INCLUDE_DIR) $(CXXFLAGS) /EHsc
 
 %.o: %.c
 	$(CC) -c $< -I ..$(SEP)$(INCLUDE_DIR) $(CFLAGS)
