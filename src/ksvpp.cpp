@@ -1,7 +1,9 @@
 #include <cstdlib>
 #include <iostream>
 #include <stdexcept>
+extern "C" {
 #include "ksv.h"
+}
 #include "ksv.hpp"
 
 struct _ksv_obj_t {
