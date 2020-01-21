@@ -61,7 +61,7 @@ else
 endif
 endif
 	CFLAGS=-Wall -Wextra -std=c89 -fvisibility=hidden
-	CXXFLAGS=-Wall -Wextra -std=c++11 -fvisibility=hidden
+	CXXFLAGS=-Wall -Wextra -std=c++98 -fvisibility=hidden
 endif
 
 ifeq ($(MAKECMDGOALS),dynamic)
