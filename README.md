@@ -33,7 +33,7 @@ Pending.
 ## Known Issues or Bugs
 
 * C file streams may not work in C++ binding
-* Dynamic libraries compiled by MSVC still crash
+* The dynamic libraries compiled by MSVC still crash
 
 ## Note
 
