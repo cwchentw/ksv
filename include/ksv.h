@@ -8,10 +8,16 @@
 #define  KSV_VERSION_PATCH  0
 
 #if _MSC_VER
+    #define KSV_STDCALL __stdcall
+#else
+    #define KSV_STDCALL
+#endif
+
+#if _MSC_VER
     #if defined(KSV_IMPORT_SYMBOLS)
-        #define KSV_PUBLIC(type) __declspec(dllimport) type __stdcall
+        #define KSV_PUBLIC(type) __declspec(dllimport) type KSV_STDCALL
     #elif defined(KSV_EXPORT_SYMBOLS)
-        #define KSV_PUBLIC(type) __declspec(dllexport) type __stdcall
+        #define KSV_PUBLIC(type) __declspec(dllexport) type KSV_STDCALL
     #else
         #define KSV_PUBLIC(type) type
     #endif
