@@ -52,7 +52,7 @@ bool KSV::load_header(FILE *stream)
 
 bool KSV::load_record(FILE *stream)
 {
-    return KSV_SUCCESS != ksv_load_record(this->obj->ksv, stream) ? true : false;
+    return KSV_SUCCESS == ksv_load_record(this->obj->ksv, stream) ? true : false;
 }
 
 bool KSV::has_header()
@@ -77,7 +77,9 @@ void KSV::restart()
 
 std::string KSV::next_header()
 {
-    return ksv_next_header(this->obj->ksv);
+    char *header = ksv_next_header(this->obj->ksv);
+
+    return !header ? "" : header;
 }
 
 bool KSV::next_column()
@@ -87,7 +89,9 @@ bool KSV::next_column()
 
 std::string KSV::next_data_by_column()
 {
-    return ksv_next_data_by_column(this->obj->ksv);
+    char *field = ksv_next_data_by_column(this->obj->ksv);
+
+    return !field ? "" : field;
 }
 
 bool KSV::next_row()
@@ -97,5 +101,7 @@ bool KSV::next_row()
 
 std::string KSV::next_data_by_row()
 {
-    return ksv_next_data_by_row(this->obj->ksv);
+    char *field = ksv_next_data_by_row(this->obj->ksv);
+
+    return !field ? "" : field;
 }

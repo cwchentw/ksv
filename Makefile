@@ -20,6 +20,7 @@ all: dynamic
 
 example:
 	$(MAKE) -C .$(SEP)$(SRC_DIR) dynamic
+	$(MAKE) -C .$(SEP)$(SRC_DIR) dynamic-cpp
 	$(MAKE) -C .$(SEP)$(EXAMPLE_DIR)
 
 dynamic:
