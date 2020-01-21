@@ -1,6 +1,12 @@
 #ifndef KSV_HPP
 #define KSV_HPP
 
+#define  KSV_VERSION  "0.1.0"
+
+#define  KSV_VERSION_MAJOR  0
+#define  KSV_VERSION_MINOR  1
+#define  KSV_VERSION_PATCH  0
+
 #if _MSC_VER
     #define KSV_STDCALL __stdcall
 #else
@@ -35,8 +41,6 @@
 
 #include <cstdio>
 #include <iostream>
-
-using std::string;
 
 typedef struct _ksv_obj_t _ksv_obj_t;
 

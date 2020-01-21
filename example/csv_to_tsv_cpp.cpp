@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
 
     FILE *fp = NULL;
     KSV *ksv = NULL;
-    string field;
+    std::string field;
 
     char *path = argv[1];
 
