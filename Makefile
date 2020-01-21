@@ -14,7 +14,7 @@ SRC_DIR=src
 EXAMPLE_DIR=example
 
 
-.PHONY: all example dynamic static exec clean
+.PHONY: all example dynamic dynamic-cpp static static-cpp exec clean
 
 all: dynamic
 
@@ -25,8 +25,14 @@ example:
 dynamic:
 	$(MAKE) -C .$(SEP)$(SRC_DIR) dynamic
 
+dynamic-cpp:
+	$(MAKE) -C .$(SEP)$(SRC_DIR) dynamic-cpp
+
 static:
 	$(MAKE) -C .$(SEP)$(SRC_DIR) static
+
+static-cpp:
+	$(MAKE) -C .$(SEP)$(SRC_DIR) static-cpp
 
 exec:
 	$(MAKE) -C .$(SEP)$(SRC_DIR) exec
