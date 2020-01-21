@@ -43,7 +43,7 @@ ifneq (,$(findstring $(CC),$(CL)))
 	LIB_DYNAMIC=ksv.dll
 	LIB_STATIC_CPP=ksvpp.lib
 	LIB_DYNAMIC_CPP=ksvpp.dll
-	CFLAGS=/W4 /sdl /D_CRT_SECURE_NO_WARNINGS /GS
+	CFLAGS=/W4 /sdl /DWIN32 /D_WINDOWS /D_CRT_SECURE_NO_WARNINGS /GS
 	CXXFLAGS=$(CFLAGS)
 else
 	LIB_STATIC=libksv.a
@@ -163,10 +163,18 @@ else
 endif
 
 %.obj: %.c
-	$(CC) /c $< $(CFLAGS)
+ifneq (,$(findstring $(MAKECMDGOALS),$(DYNAMIC)))
+	$(CC) /c $< $(CFLAGS) /MD
+else
+	$(CC) /c $< $(CFLAGS) /MT
+endif
 
 %.obj: %.cpp
-	$(CC) /c $< $(CXXFLAGS)
+ifeq (dynamic-cpp,$(MAKECMDGOALS))
+	$(CC) /c $< $(CXXFLAGS) /MD
+else
+	$(CC) /c $< $(CXXFLAGS) /MT
+endif
 
 %.o: %.c
 ifneq (,$(findstring $(MAKECMDGOALS),$(DYNAMIC)))

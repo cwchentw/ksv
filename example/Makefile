@@ -46,7 +46,7 @@ ifneq (,$(findstring $(CC),$(CL)))
 	LIB_EXPORT_CPP=ksvpp.exp
 	LIB_STATIC_CPP=ksvpp.lib
 	LIB_DYNAMIC_CPP=ksvpp.dll
-	CFLAGS=/W4 /sdl /D_CRT_SECURE_NO_WARNINGS /DKSV_IMPORT_SYMBOLS
+	CFLAGS=/W4 /sdl /DWIN32 /D_WINDOWS /D_CRT_SECURE_NO_WARNINGS /DKSV_IMPORT_SYMBOLS
 	CXXFLAGS=$(CFLAGS)
 else
 ifeq ($(detected_OS),Darwin)
@@ -64,7 +64,6 @@ endif
 	CFLAGS=-Wall -Wextra -std=c89
 	CXXFLAGS=-Wall -Wextra -std=c++98
 endif
-
 
 .PHONY: example clean
 
@@ -119,10 +118,10 @@ else
 endif
 
 %.obj: %.c
-	$(CC) /c $< /I..$(SEP)$(INCLUDE_DIR) $(CFLAGS)
+	$(CC) /c $< /I..$(SEP)$(INCLUDE_DIR) $(CFLAGS) /MD
 
 %.obj: %.cpp
-	$(CC) /c $< /I..$(SEP)$(INCLUDE_DIR) $(CXXFLAGS) /EHsc
+	$(CC) /c $< /I..$(SEP)$(INCLUDE_DIR) $(CXXFLAGS) /MD /EHsc
 
 %.o: %.c
 	$(CC) -c $< -I ..$(SEP)$(INCLUDE_DIR) $(CFLAGS)
