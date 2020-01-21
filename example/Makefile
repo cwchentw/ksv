@@ -77,8 +77,8 @@ ifeq ($(detected_OS),Darwin)
 	.$(SEP)$(EXEC_CSV_TO_TSV) ..$(SEP)$(DATA_DIR)$(SEP)iris_partial.csv
 	.$(SEP)$(EXEC_CSV_TO_TSV_CPP) ..$(SEP)$(DATA_DIR)$(SEP)iris_partial.csv
 else
-	LD_LIBRARY_PATH=. .$(SEP)$(EXEC_CSV_TO_TSV) ..$(SEP)$(DATA_DIR)$(SEP)iris.csv
-	LD_LIBRARY_PATH=. .$(SEP)$(EXEC_CSV_TO_TSV_CPP) ..$(SEP)$(DATA_DIR)$(SEP)iris.csv
+	LD_LIBRARY_PATH=. .$(SEP)$(EXEC_CSV_TO_TSV) ..$(SEP)$(DATA_DIR)$(SEP)iris_partial.csv
+	LD_LIBRARY_PATH=. .$(SEP)$(EXEC_CSV_TO_TSV_CPP) ..$(SEP)$(DATA_DIR)$(SEP)iris_partial.csv
 endif
 endif
 
