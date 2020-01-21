@@ -8,23 +8,17 @@
 #define  KSV_VERSION_PATCH  0
 
 #if _MSC_VER
-    #define KSV_STDCALL __stdcall
-#else
-    #define KSV_STDCALL
-#endif
-
-#if _MSC_VER
     #if defined(KSV_IMPORT_SYMBOLS)
-        #define KSV_PUBLIC(type) __declspec(dllimport) type KSV_STDCALL
+        #define KSV_PUBLIC __declspec(dllimport) type
     #elif defined(KSV_EXPORT_SYMBOLS)
-        #define KSV_PUBLIC(type) __declspec(dllexport) type KSV_STDCALL
+        #define KSV_PUBLIC __declspec(dllexport) type
     #else
-        #define KSV_PUBLIC(type) type
+        #define KSV_PUBLIC
     #endif
 #elif __GNUC__ >= 4 || __clang__
-    #define KSV_PUBLIC(type) __attribute__((__visibility__("default"))) type
+    #define KSV_PUBLIC __attribute__((__visibility__("default")))
 #else
-    #define KSV_PUBLIC(type) type
+    #define KSV_PUBLIC
 #endif
 
 #if __GNUC__ >= 4 || __clang__
@@ -44,7 +38,7 @@
 
 typedef struct _ksv_obj_t _ksv_obj_t;
 
-class KSV_PUBLIC(KSV)
+class KSV_PUBLIC KSV
 {
 public:
     KSV(std::string delimiter = ",",

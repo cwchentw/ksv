@@ -8,23 +8,17 @@
 #define  KSV_VERSION_PATCH  0
 
 #if _MSC_VER
-    #define KSV_STDCALL __stdcall
-#else
-    #define KSV_STDCALL
-#endif
-
-#if _MSC_VER
     #if defined(KSV_IMPORT_SYMBOLS)
-        #define KSV_PUBLIC(type) __declspec(dllimport) type KSV_STDCALL
+        #define KSV_PUBLIC __declspec(dllimport)
     #elif defined(KSV_EXPORT_SYMBOLS)
-        #define KSV_PUBLIC(type) __declspec(dllexport) type KSV_STDCALL
+        #define KSV_PUBLIC __declspec(dllexport)
     #else
-        #define KSV_PUBLIC(type) type
+        #define KSV_PUBLIC
     #endif
 #elif __GNUC__ >= 4 || __clang__
-    #define KSV_PUBLIC(type) __attribute__((__visibility__("default"))) type
+    #define KSV_PUBLIC __attribute__((__visibility__("default")))
 #else
-    #define KSV_PUBLIC(type) type
+    #define KSV_PUBLIC
 #endif
 
 #if __GNUC__ >= 4 || __clang__
@@ -84,21 +78,21 @@ typedef struct ksv_t ksv_t;
 extern "C" {
 #endif
 
-KSV_PUBLIC(ksv_t *) ksv_new_default(void);
-KSV_PUBLIC(ksv_t *) ksv_new(char *delimeter, char *end_of_line, char *quote);
-KSV_PUBLIC(void) ksv_delete(void *self);
-KSV_PUBLIC(KSV_STATUS) ksv_load_table_with_header_strictly(ksv_t *self, FILE *stream);
-KSV_PUBLIC(KSV_STATUS) ksv_load_header(ksv_t *self, FILE *stream);
-KSV_PUBLIC(KSV_STATUS) ksv_load_record(ksv_t *self, FILE *stream);
-KSV_PUBLIC(BOOL) ksv_has_header(ksv_t *self);
-KSV_PUBLIC(size_t) ksv_row(ksv_t *self);
-KSV_PUBLIC(size_t) ksv_col(ksv_t *self);
-KSV_PUBLIC(void) ksv_restart(ksv_t *self);
-KSV_PUBLIC(char *) ksv_next_header(ksv_t *self);
-KSV_PUBLIC(BOOL) ksv_next_column(ksv_t *self);
-KSV_PUBLIC(char *) ksv_next_data_by_column(ksv_t *self);
-KSV_PUBLIC(BOOL) ksv_next_row(ksv_t *self);
-KSV_PUBLIC(char *) ksv_next_data_by_row(ksv_t *self);
+KSV_PUBLIC ksv_t * ksv_new_default(void);
+KSV_PUBLIC ksv_t * ksv_new(char *delimeter, char *end_of_line, char *quote);
+KSV_PUBLIC void ksv_delete(void *self);
+KSV_PUBLIC KSV_STATUS ksv_load_table_with_header_strictly(ksv_t *self, FILE *stream);
+KSV_PUBLIC KSV_STATUS ksv_load_header(ksv_t *self, FILE *stream);
+KSV_PUBLIC KSV_STATUS ksv_load_record(ksv_t *self, FILE *stream);
+KSV_PUBLIC BOOL ksv_has_header(ksv_t *self);
+KSV_PUBLIC size_t ksv_row(ksv_t *self);
+KSV_PUBLIC size_t ksv_col(ksv_t *self);
+KSV_PUBLIC void ksv_restart(ksv_t *self);
+KSV_PUBLIC char * ksv_next_header(ksv_t *self);
+KSV_PUBLIC BOOL ksv_next_column(ksv_t *self);
+KSV_PUBLIC char * ksv_next_data_by_column(ksv_t *self);
+KSV_PUBLIC BOOL ksv_next_row(ksv_t *self);
+KSV_PUBLIC char * ksv_next_data_by_row(ksv_t *self);
 
 #ifdef __cplusplus
 }

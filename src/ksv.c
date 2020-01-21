@@ -34,12 +34,12 @@ BOOL APIENTRY DllMain(
 }
 #endif
 
-ksv_t * KSV_STDCALL ksv_new_default(void)
+ksv_t * ksv_new_default(void)
 {
     return ksv_new(",", "\n", "\"");
 }
 
-ksv_t * KSV_STDCALL ksv_new(char *delimeter, char *end_of_line, char *quote)
+ksv_t * ksv_new(char *delimeter, char *end_of_line, char *quote)
 {
     assert(delimeter && 0 != strcmp("", delimeter));
     assert(end_of_line && 0 != strcmp("", end_of_line));
@@ -74,7 +74,7 @@ ksv_t * KSV_STDCALL ksv_new(char *delimeter, char *end_of_line, char *quote)
     return csv;
 }
 
-void KSV_STDCALL ksv_delete(void *self)
+void ksv_delete(void *self)
 {
     assert(self);
 
@@ -107,28 +107,28 @@ void KSV_STDCALL ksv_delete(void *self)
     free(self);
 }
 
-BOOL KSV_STDCALL ksv_has_header(ksv_t *self)
+BOOL ksv_has_header(ksv_t *self)
 {
     assert(self);
 
     return self->header ? TRUE : FALSE;
 }
 
-size_t KSV_STDCALL ksv_row(ksv_t *self)
+size_t ksv_row(ksv_t *self)
 {
     assert(self);
 
     return self->row;
 }
 
-size_t KSV_STDCALL ksv_col(ksv_t *self)
+size_t ksv_col(ksv_t *self)
 {
     assert(self);
 
     return self->col;
 }
 
-void KSV_STDCALL ksv_restart(ksv_t *self)
+void ksv_restart(ksv_t *self)
 {
     assert(self);
 
@@ -137,7 +137,7 @@ void KSV_STDCALL ksv_restart(ksv_t *self)
     self->index_row = 0;
 }
 
-char * KSV_STDCALL ksv_next_header(ksv_t *self)
+char * ksv_next_header(ksv_t *self)
 {
     assert(self);
 
@@ -153,7 +153,7 @@ char * KSV_STDCALL ksv_next_header(ksv_t *self)
     return header;
 }
 
-BOOL KSV_STDCALL ksv_next_column(ksv_t *self)
+BOOL ksv_next_column(ksv_t *self)
 {
     assert(self);
 
@@ -166,7 +166,7 @@ BOOL KSV_STDCALL ksv_next_column(ksv_t *self)
     return TRUE;
 }
 
-char * KSV_STDCALL ksv_next_data_by_column(ksv_t *self)
+char * ksv_next_data_by_column(ksv_t *self)
 {
     assert(self);
 
@@ -181,7 +181,7 @@ char * KSV_STDCALL ksv_next_data_by_column(ksv_t *self)
     return field;
 }
 
-BOOL KSV_STDCALL ksv_next_row(ksv_t *self)
+BOOL ksv_next_row(ksv_t *self)
 {
     assert(self);
 
@@ -194,7 +194,7 @@ BOOL KSV_STDCALL ksv_next_row(ksv_t *self)
     return TRUE;
 }
 
-char * KSV_STDCALL ksv_next_data_by_row(ksv_t *self)
+char * ksv_next_data_by_row(ksv_t *self)
 {
     assert(self);
 
@@ -212,7 +212,7 @@ char * KSV_STDCALL ksv_next_data_by_row(ksv_t *self)
 static KSV_STATUS ksv_header_push(ksv_t *self, char *field);
 static KSV_STATUS ksv_rows_push(ksv_t *self, char *field);
 
-KSV_STATUS KSV_STDCALL ksv_load_table_with_header_strictly(ksv_t *self, FILE *stream)
+KSV_STATUS ksv_load_table_with_header_strictly(ksv_t *self, FILE *stream)
 {
     assert(self);
 
@@ -358,7 +358,7 @@ ERROR_CSV:
     return ksv_status;
 }
 
-KSV_STATUS KSV_STDCALL ksv_load_header(ksv_t *self, FILE *stream)
+KSV_STATUS ksv_load_header(ksv_t *self, FILE *stream)
 {
     assert(self);
 
@@ -492,7 +492,7 @@ ERROR_CSV:
     return ksv_status;
 }
 
-KSV_STATUS KSV_STDCALL ksv_load_record(ksv_t *self, FILE *stream)
+KSV_STATUS ksv_load_record(ksv_t *self, FILE *stream)
 {
     assert(self);
 
