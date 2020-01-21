@@ -68,17 +68,14 @@ endif
 
 .PHONY: example clean
 
-example: $(EXEC_CSV_TO_TSV) $(EXEC_CSV_TO_TSV_CPP)
+example: $(EXEC_CSV_TO_TSV)
 ifeq ($(detected_OS),Windows)
 	.$(SEP)$(EXEC_CSV_TO_TSV) ..$(SEP)$(DATA_DIR)$(SEP)iris_partial.csv
-	.$(SEP)$(EXEC_CSV_TO_TSV_CPP) ..$(SEP)$(DATA_DIR)$(SEP)iris_partial.csv
 else
 ifeq ($(detected_OS),Darwin)
 	.$(SEP)$(EXEC_CSV_TO_TSV) ..$(SEP)$(DATA_DIR)$(SEP)iris_partial.csv
-	.$(SEP)$(EXEC_CSV_TO_TSV_CPP) ..$(SEP)$(DATA_DIR)$(SEP)iris_partial.csv
 else
 	LD_LIBRARY_PATH=. .$(SEP)$(EXEC_CSV_TO_TSV) ..$(SEP)$(DATA_DIR)$(SEP)iris_partial.csv
-	LD_LIBRARY_PATH=. .$(SEP)$(EXEC_CSV_TO_TSV_CPP) ..$(SEP)$(DATA_DIR)$(SEP)iris_partial.csv
 endif
 endif
 
@@ -91,6 +88,17 @@ ifneq (,$(findstring $(CC),$(CL)))
 else
 	$(CP) ..$(SEP)$(DIST_DIR)$(SEP)$(LIB_DYNAMIC) .
 	$(CC) -o $(EXEC_CSV_TO_TSV) $(OBJS_CSV_TO_TSV) $(LIB_DYNAMIC) $(CFLAGS)
+endif
+
+example-cpp: $(EXEC_CSV_TO_TSV_CPP)
+ifeq ($(detected_OS),Windows)
+	.$(SEP)$(EXEC_CSV_TO_TSV_CPP) ..$(SEP)$(DATA_DIR)$(SEP)iris_partial.csv
+else
+ifeq ($(detected_OS),Darwin)
+	.$(SEP)$(EXEC_CSV_TO_TSV_CPP) ..$(SEP)$(DATA_DIR)$(SEP)iris_partial.csv
+else
+	LD_LIBRARY_PATH=. .$(SEP)$(EXEC_CSV_TO_TSV_CPP) ..$(SEP)$(DATA_DIR)$(SEP)iris_partial.csv
+endif
 endif
 
 $(EXEC_CSV_TO_TSV_CPP): $(OBJS_CSV_TO_TSV_CPP)
