@@ -41,7 +41,7 @@ CL := cl icl
 ifneq (,$(findstring $(CC),$(CL)))
 	LIB_STATIC=ksv.lib
 	LIB_DYNAMIC=ksv.dll
-	CFLAGS=/W4 /sdl /D_CRT_SECURE_NO_WARNINGS /Za /GS
+	CFLAGS=/W4 /sdl /D_CRT_SECURE_NO_WARNINGS /GS
 else
 	LIB_STATIC=libksv.a
 ifeq ($(detected_OS),Darwin)

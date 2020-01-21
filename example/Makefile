@@ -59,7 +59,7 @@ endif
 
 example: $(EXEC_CSV_TO_TSV)
 ifeq ($(detected_OS),Windows)
-        .$(SEP)$(EXEC_CSV_TO_TSV) ..$(SEP)$(DATA_DIR)$(SEP)iris.csv
+	.$(SEP)$(EXEC_CSV_TO_TSV) ..$(SEP)$(DATA_DIR)$(SEP)iris.csv
 else
 ifeq ($(detected_OS),Darwin)
 	.$(SEP)$(EXEC_CSV_TO_TSV) ..$(SEP)$(DATA_DIR)$(SEP)iris.csv
