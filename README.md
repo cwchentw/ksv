@@ -42,13 +42,13 @@ Build the console tool, which is statically linked:
 $ make exec
 ```
 
-Build the C++ binding of a dynamic library:
+Build the C++ binding of the dynamic library of **ksv**:
 
 ```console
 $ make dynamic-cpp
 ```
 
-Build the C++ binding of a static library:
+Build the C++ binding of the static library of **ksv**:
 
 ```console
 $ make static-cpp
