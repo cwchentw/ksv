@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
     }
 
     if (KSV_SUCCESS != ksv_load_header(ksv, fp)) {
-        PUTERR("Failed to load header");
+        PUTERR("Failed to load sheet header");
         goto ERROR_MAIN;
     }
 
@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
 
     while (!feof(fp)) {
         if (KSV_SUCCESS != ksv_load_record(ksv, fp)) {
-            PUTERR("Failed to load record");
+            PUTERR("Failed to load a sheet record");
             goto ERROR_MAIN;
         }
 

@@ -29,6 +29,7 @@ int main(int argc, char *argv[])
     }
 
     if (!ksv->load_header(fp)) {
+        std::cerr << "Failed to load sheet header" << std::endl;
         goto ERROR_MAIN;
     }
 
@@ -42,7 +43,7 @@ int main(int argc, char *argv[])
 
     while (!feof(fp)) {
         if (!ksv->load_record(fp)) {
-            std::cerr << "Failed to load record" << std::endl;
+            std::cerr << "Failed to load a sheet record" << std::endl;
             goto ERROR_MAIN;
         }
 

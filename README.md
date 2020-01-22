@@ -22,6 +22,40 @@ We test **ksv** against several Unix or Unix-like systems:
 
 In addition, we test **ksv** against Windows 10 as well.
 
+## Build the Project:
+
+By default, the project is built into a dynamic library:
+
+```console
+$ make
+```
+
+Build the project into a static library:
+
+```console
+$ make static
+```
+
+Build the console tool, which is statically linked:
+
+```console
+$ make exec
+```
+
+Build the C++ binding of a dynamic library:
+
+```console
+$ make dynamic-cpp
+```
+
+Build the C++ binding of a static library:
+
+```console
+$ make static-cpp
+```
+
+Besides, copy the header files at *include* to use **ksv**.
+
 ## Usage of the Library
 
 ### C API
@@ -96,11 +130,102 @@ fclose(fp);
 
 ### C++ API
 
-Pending.
+See a full example [here](/example/csv_to_tsv_cpp.cpp).
+
+Load a CSV sheet into a C file stream:
+
+```c++
+FILE *fp = fopen("path/to/sheet.csv", "r");
+```
+
+Currently, the C++ binding of **ksv** still uses a C file stream to load a CSV sheet.
+
+Create a `ksv` object:
+
+```c++
+KSV *ksv = new KSV();
+```
+
+Load sheet header:
+
+```c++
+if (!ksv->load_header(fp)) {
+    std::cerr << "Failed to load sheet header" << std::endl;
+    goto ERROR_MAIN;
+}
+```
+
+Read each header field:
+
+```c++
+char *field = ksv->next_header();
+while (!field.empty()) {
+    std::cout << field << "\t";
+
+    field = ksv->next_header();   
+}
+std::cout << "\b" << std::endl;
+```
+
+Load sheet records and read the fields in each record line by line:
+
+```c++
+while (!feof(fp)) {
+    if (!ksv->load_record(fp)) {
+        std::cerr << "Failed to load a sheet record" << std::endl;
+        goto ERROR_MAIN;
+    }
+
+    ksv->restart();
+
+    field = ksv->next_data_by_row();
+    while (!field.empty()) {
+        std::cout << field << "\t";
+
+        field = ksv->next_data_by_row();
+    }
+    std::cout << "\b" << std::endl;
+}
+```
+
+Release system resources:
+
+```c++
+delete ksv;
+fclose(fp);
+```
 
 ## Usage of the Console Tool
 
-Pending.
+Show the count of the columns of a CSV sheet:
+
+```console
+$ ksv width path/to/sheet.csv
+```
+
+Show the count of the records (or rows) of a CSV sheet:
+
+```console
+$ ksv height path/to/sheet.csv
+```
+
+Show the dimension of a CSV sheet:
+
+```console
+$ ksv dimension path/to/sheet.csv
+```
+
+Show a console table of a CSV sheet:
+
+```console
+$ ksv table path/to/sheet.csv
+```
+
+Show the help info of **ksv**:
+
+```console
+$ ksv help
+```
 
 ## Known Issues or Bugs
 
