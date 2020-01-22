@@ -227,16 +227,16 @@ Show the help info of **ksv**:
 $ ksv help
 ```
 
+## Note
+
+Currently, **ksv** is distributed mainly as a C library. The `ksv` cli tool is just a byproduct of the library, never a feature-rich CSV or TSV tool.
+
+We copy some utility code from [cwchentw/clibs](https://github.com/cwchentw/clibs).
+
 ## Known Issues or Bugs
 
 * C file streams may not work in C++ binding
 * The dynamic libraries compiled by MSVC still crash
-
-## Note
-
-Currently, **ksv** is distributed mainly as a C library. The **ksv** cli tool is just a byproduct of the library, never a feature-rich CSV or TSV tool.
-
-We copy some utility code from [cwchentw/clibs](https://github.com/cwchentw/clibs).
 
 ## Copyright
 
