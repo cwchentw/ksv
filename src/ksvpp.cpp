@@ -86,7 +86,7 @@ std::string KSV::next_header()
 
 bool KSV::next_column()
 {
-    return KSV_SUCCESS == ksv_next_column(this->obj->ksv) ? true : false;
+    return TRUE == ksv_next_column(this->obj->ksv) ? true : false;
 }
 
 std::string KSV::next_data_by_column()
@@ -98,7 +98,7 @@ std::string KSV::next_data_by_column()
 
 bool KSV::next_row()
 {
-    return KSV_SUCCESS == ksv_next_row(this->obj->ksv) ? true : false;
+    return TRUE == ksv_next_row(this->obj->ksv) ? true : false;
 }
 
 std::string KSV::next_data_by_row()
