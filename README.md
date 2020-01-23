@@ -236,7 +236,6 @@ We copy some utility code from [cwchentw/clibs](https://github.com/cwchentw/clib
 ## Known Issues or Bugs
 
 * C file streams may not work in C++ binding
-* The dynamic libraries compiled by MSVC still crash
 
 ## Copyright
 
