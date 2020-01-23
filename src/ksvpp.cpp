@@ -47,12 +47,12 @@ bool KSV::load_table_with_header_strictly(FILE *stream)
         ? true : false;
 }
 
-bool KSV::load_header(FILE *stream)
+bool KSV::load_header(std::FILE *stream)
 {
     return KSV_SUCCESS == ksv_load_header(this->obj->ksv, stream) ? true : false;
 }
 
-bool KSV::load_record(FILE *stream)
+bool KSV::load_record(std::FILE *stream)
 {
     return KSV_SUCCESS == ksv_load_record(this->obj->ksv, stream) ? true : false;
 }

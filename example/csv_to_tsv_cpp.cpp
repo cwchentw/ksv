@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
         goto ERROR_MAIN;
     }
 
-    if (!ksv->load_table_with_header_strictly(fp)) {
+    if (!ksv->load_header(fp)) {
         std::cerr << "Failed to load sheet header" << std::endl;
         goto ERROR_MAIN;
     }
@@ -41,7 +41,14 @@ int main(int argc, char *argv[])
     }
     std::cout << "\b" << std::endl;
 
-    while (1) {
+    while (!std::feof(fp)) {
+        if (!ksv->load_record(fp)) {
+            std::cerr << "Failed to load a sheet record" << std::endl;
+            goto ERROR_MAIN;
+        }
+
+        ksv->restart();
+
         field = ksv->next_data_by_row();
         while (!field.empty()) {
             std::cout << field << "\t";
@@ -49,9 +56,6 @@ int main(int argc, char *argv[])
             field = ksv->next_data_by_row();
         }
         std::cout << "\b" << std::endl;
-
-        if (!ksv->next_row())
-            break;
     }
 
     delete ksv;

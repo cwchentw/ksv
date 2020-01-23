@@ -47,8 +47,8 @@ public:
     ~KSV();
     std::string version();
     bool load_table_with_header_strictly(FILE *stream);
-    bool load_header(FILE *stream);
-    bool load_record(FILE *stream);
+    bool load_header(std::FILE *stream);
+    bool load_record(std::FILE *stream);
     bool has_header();
     size_t row();
     size_t col();
