@@ -64,9 +64,12 @@ endif
 	CXXFLAGS=-Wall -Wextra -std=c++98 -fvisibility=hidden
 endif
 
-ifeq ($(MAKECMDGOALS),dynamic)
+DYNAMIC := dynamic dynamic-cpp
+
+ifneq (,$(findstring $(MAKECMDGOALS),$(DYNAMIC)))
 ifneq (,$(findstring $(CC),$(CL)))
 	CFLAGS+=/DKSV_EXPORT_SYMBOLS
+	CXXFLAGS+=/DKSV_EXPORT_SYMBOLS
 endif  # CL
 endif  # dynamic
 

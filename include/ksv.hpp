@@ -9,9 +9,9 @@
 
 #if _MSC_VER
     #if defined(KSV_IMPORT_SYMBOLS)
-        #define KSV_PUBLIC __declspec(dllimport) type
+        #define KSV_PUBLIC __declspec(dllimport)
     #elif defined(KSV_EXPORT_SYMBOLS)
-        #define KSV_PUBLIC __declspec(dllexport) type
+        #define KSV_PUBLIC __declspec(dllexport)
     #else
         #define KSV_PUBLIC
     #endif
