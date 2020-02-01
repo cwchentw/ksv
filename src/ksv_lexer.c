@@ -94,7 +94,7 @@ KSV_STATUS ksv_lexer_lex(ksv_lexer_t *self, char *input)
                         goto LEX_STRING;
                 }
 
-                char *eol = string_allocate("\r\n");
+                char *eol = string_allocate(self->end_of_line);
                 if (!eol)
                     return KSV_NO_MEMORY;
 
@@ -163,7 +163,7 @@ KSV_STATUS ksv_lexer_lex(ksv_lexer_t *self, char *input)
             }
             else {
             LEX_STRING:
-                for (j = i; j < strlen(input); j++) {
+                for (j = i; j < strlen(input); ++j) {
                     size_t k;
                     BOOL is_eol = TRUE;
                     for (k = 0; k < strlen(self->end_of_line) && j+k < strlen(input); k++) {
