@@ -1,4 +1,3 @@
-* Read embedded newline in field
 * Add automated tests for `ksv` cli utility
 * Add subcommand
   * `vcat`: concat two or more CSV sheets vertically
