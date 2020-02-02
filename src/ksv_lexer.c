@@ -85,9 +85,9 @@ KSV_STATUS ksv_lexer_lex(ksv_lexer_t *self, char *input)
 #endif
 
     {
-        size_t i;
+        size_t i = 0;
         size_t j;
-        for (i = 0; i < strlen(input); i++) {
+        while (i < strlen(input)) {
             if (self->end_of_line[0] == input[i]) {
                 for (j = 0; j < strlen(self->end_of_line) && i+j < strlen(input); j++) {
                     if (self->end_of_line[j] != input[i+j])
@@ -111,7 +111,7 @@ KSV_STATUS ksv_lexer_lex(ksv_lexer_t *self, char *input)
                 if (KSV_SUCCESS != s)
                     return s;
 
-                i += 1;
+                i += strlen(self->end_of_line);
             }
             else if (self->quote[0] == input[i]) {
                 for (j = 0; j < strlen(self->quote) && i+j < strlen(input); j++) {
@@ -135,6 +135,8 @@ KSV_STATUS ksv_lexer_lex(ksv_lexer_t *self, char *input)
                 KSV_STATUS s = ksv_lexer_push(self, token);
                 if (KSV_SUCCESS != s)
                     return s;
+
+                i += strlen(self->quote);
             }
             else if (self->delimeter[0] == input[i]) {
                 for (j = 0; j < strlen(self->delimeter) && i+j < strlen(input); j++) {
@@ -159,14 +161,14 @@ KSV_STATUS ksv_lexer_lex(ksv_lexer_t *self, char *input)
                 if (KSV_SUCCESS != s)
                     return s;
 
-                i += j - 1;
+                i += strlen(self->delimeter);
             }
             else {
             LEX_STRING:
                 for (j = i; j < strlen(input); ++j) {
                     size_t k;
                     BOOL is_eol = TRUE;
-                    for (k = 0; k < strlen(self->end_of_line) && j+k < strlen(input); k++) {
+                    for (k = 0; k < strlen(self->end_of_line) && j+k < strlen(input); ++k) {
                         if (self->end_of_line[k] != input[j+k]) {
                             is_eol = FALSE;
                             break;
@@ -177,7 +179,7 @@ KSV_STATUS ksv_lexer_lex(ksv_lexer_t *self, char *input)
                         break;
 
                     BOOL is_quote = TRUE;
-                    for (k = 0; k < strlen(self->quote) && j+k < strlen(input); k++) {
+                    for (k = 0; k < strlen(self->quote) && j+k < strlen(input); ++k) {
                         if (self->quote[k] != input[j+k]) {
                             is_quote = FALSE;
                             break;
@@ -188,7 +190,7 @@ KSV_STATUS ksv_lexer_lex(ksv_lexer_t *self, char *input)
                         break;
 
                     BOOL is_delim = TRUE;
-                    for (k = 0; k < strlen(self->delimeter) && j+k < strlen(input); k++) {
+                    for (k = 0; k < strlen(self->delimeter) && j+k < strlen(input); ++k) {
                         if (self->delimeter[k] != input[j+k]) {
                             is_delim = FALSE;
                             break;
@@ -198,6 +200,10 @@ KSV_STATUS ksv_lexer_lex(ksv_lexer_t *self, char *input)
                     if (is_delim)
                         break;
                 }
+
+            #if DEBUG
+                PUTERR("i: %lu, j: %lu", i, j);
+            #endif
 
                 char *s = string_allocate_substring(input, i, j - 1);
                 if (!s)
@@ -216,7 +222,7 @@ KSV_STATUS ksv_lexer_lex(ksv_lexer_t *self, char *input)
                 if (KSV_SUCCESS != status)
                     return status;
 
-                i = j - 1;
+                i = j;
             }
         }
     }

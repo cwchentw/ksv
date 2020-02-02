@@ -21,14 +21,6 @@
     }
 #endif
 
-BOOL string_is_equal(const char *a, const char *b)
-{
-    if (0 == strcmp(a, b))
-        return TRUE;
-
-    return FALSE;
-}
-
 BOOL string_starts_with(const char *a, const char *b)
 {
     size_t i = 0;
@@ -137,7 +129,7 @@ char * string_allocate(const char *s)
 
 char * string_allocate_substring(const char *s, size_t from, size_t to)
 {
-    assert(from < to);
+    assert(from <= to);
 
     size_t len = strlen(s);
     assert(to <= len);
