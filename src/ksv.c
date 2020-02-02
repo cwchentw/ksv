@@ -596,6 +596,7 @@ KSV_STATUS ksv_load_header(ksv_t *self, FILE *stream)
             break;
     }
 
+    free(buf);
     free(line);
 
     return KSV_SUCCESS;
@@ -606,6 +607,9 @@ ERROR_CSV:
 
     if (lexer)
         ksv_lexer_delete(lexer);
+
+    if (buf)
+        free(buf);
 
     if (line)
         free(line);
