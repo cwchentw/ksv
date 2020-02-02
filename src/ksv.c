@@ -549,6 +549,7 @@ KSV_STATUS ksv_load_record(ksv_t *self, FILE *stream)
     self->row = 0;
 
     char *line = NULL;
+    char *buf = NULL;
     ksv_lexer_t *lexer = NULL;
     ksv_parser_t *parser = NULL;
 
@@ -561,6 +562,21 @@ KSV_STATUS ksv_load_record(ksv_t *self, FILE *stream)
     #endif
         return KSV_NO_MEMORY;
     }
+
+    line[0] = '\0';
+
+    size_t buffer_width = 150;  /* Sensible initial buffer width. */
+    size_t buffer_offset = 0;
+    buf = (char *) malloc(buffer_width * sizeof(char));
+    if (!buf) {
+    #if DEBUG
+        PUTERR("Failed to allocate memory for C string buffer");
+        PUTERR("Check available system memory");
+    #endif
+        return KSV_NO_MEMORY;
+    }
+
+    buf[0] = '\0';
 
     KSV_STATUS ksv_status = KSV_FAILURE;
     while (fgets(line, line_width, stream)) {
@@ -598,13 +614,101 @@ KSV_STATUS ksv_load_record(ksv_t *self, FILE *stream)
                 goto ERROR_CSV;
             }
 
-            ksv_status = ksv_lexer_lex(lexer, line);
+            if (KSV_UNPAIRED_QUOTE == ksv_status) {
+            #if DEBUG
+                PUTERR("Line to add to buffer: -->%s<--", line);
+                PUTERR("Buffer before scan: -->%s<--", buf);
+            #endif
+                if (buffer_width - buffer_offset <= line_width + 1) {
+                #if DEBUG
+                    PUTERR("Extend text buffer");
+                #endif
+                    while (buffer_width - buffer_offset <= line_width + 1)
+                        buffer_width <<= 1;
+
+                    char *buf_old = buf;
+                    char *buf_new = \
+                        (char *) malloc(buffer_width * sizeof(char));
+                    if (!buf_new) {
+                    #if DEBUG
+                        PUTERR("Failed to allocate memory for string buffer");
+                        PUTERR("Check available system memory");
+                    #endif
+                        ksv_status = KSV_NO_MEMORY;
+                        goto ERROR_CSV;
+                    }
+
+                    {
+                        size_t i;
+                        for (i = 0; i < strlen(buf); ++i)
+                            buf_new[i] = buf_old[i];
+                    }
+
+                    buf_new[strlen(buf)] = '\0';
+
+                    buf = buf_new;
+                    /* free(buf_old); */
+                }
+
+                strcat(buf, line);
+                buffer_offset += line_width;
+                buf[buffer_offset] = '\0';
+            
+            #if DEBUG
+                PUTERR("Buffer to scan: -->%s<--", buf);
+            #endif
+
+                ksv_status = ksv_lexer_lex(lexer, buf);
+            }
+            else {
+                ksv_status = ksv_lexer_lex(lexer, line);
+
+                /* Clean text buffer. */
+                buf[0] = '\0';
+                buffer_offset = 0;
+            }
+            
             if (KSV_SUCCESS != ksv_status)
                 goto ERROR_CSV;
 
             ksv_status = ksv_parser_parse(parser, lexer);
-            if (KSV_SUCCESS != ksv_status)
+            if (KSV_UNPAIRED_QUOTE == ksv_status) {
+            #if DEBUG
+                PUTERR("Try to copy string to empty buffer");
+            #endif
+                if (0 == buffer_offset) {
+                    if (buffer_width - buffer_offset <= line_width + 1) {
+                    while (buffer_width - buffer_offset <= line_width + 1)
+                        buffer_width <<= 1;
+
+                        if (!realloc(buf, buffer_width)) {
+                        #if DEBUG
+                            PUTERR("Failed to allocate memory for C string buffer");
+                            PUTERR("Check available system memory");
+                        #endif
+                            return KSV_NO_MEMORY;
+                        }
+                    }
+
+                    {
+                        size_t i;
+                        for (i = 0; i < strlen(line); ++i)
+                            buf[i] = line[i];
+                    }
+
+                    buffer_offset += line_width;
+                    buf[buffer_offset] = '\0';
+                
+                #if DEBUG
+                    PUTERR("Copy string to buffer: -->%s<--", buf);
+                #endif
+                }
+
+                goto END_CSV_RECORD;
+            }
+            else if (KSV_SUCCESS != ksv_status) {
                 goto ERROR_CSV;
+            }
 
             ksv_ast_t *ast = ksv_parser_next(parser);
             char *field = NULL;
@@ -637,17 +741,27 @@ KSV_STATUS ksv_load_record(ksv_t *self, FILE *stream)
                 ast = ksv_parser_next(parser);
             }
 
-            ksv_lexer_delete(lexer);
+        END_CSV_RECORD:
+        #if DEBUG
+            PUTERR("Buffer before inner conditional: -->%s<--", buf);
+        #endif
+            /* ksv_lexer_delete(lexer); */
             lexer = NULL;
 
-            ksv_parser_delete(parser);
+            /* ksv_parser_delete(parser); */
             parser = NULL;
         }
 
-        /* Only read first line. */
-        break;
+    #if DEBUG
+        PUTERR("Buffer after inner conditional: -->%s<--", buf);
+    #endif
+
+        /* Only read first record. */
+        if (KSV_UNPAIRED_QUOTE != ksv_status)
+            break;
     }
 
+    free(buf);
     free(line);
 
     return KSV_SUCCESS;
@@ -661,6 +775,9 @@ ERROR_CSV:
 
     if (line)
         free(line);
+
+    if (buf)
+        free(buf);
 
     return ksv_status;
 }

@@ -65,12 +65,13 @@
 
 typedef unsigned char KSV_STATUS;
 
-#define  KSV_SUCCESS        0
-#define  KSV_FAILURE        1
-#define  KSV_NO_MEMORY      2
-#define  KSV_ERROR_LEXING   3
-#define  KSV_ERROR_PARSING  4
-#define  KSV_INVALID_FILE   5
+#define  KSV_SUCCESS         0
+#define  KSV_FAILURE         1
+#define  KSV_NO_MEMORY       2
+#define  KSV_ERROR_LEXING    3
+#define  KSV_ERROR_PARSING   4
+#define  KSV_UNPAIRED_QUOTE  5
+#define  KSV_INVALID_FILE    6
 
 typedef struct ksv_t ksv_t;
 

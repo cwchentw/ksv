@@ -84,6 +84,8 @@ KSV_STATUS ksv_parser_parse(ksv_parser_t *self, ksv_lexer_t *lexer)
             /* Drop the token. */
             ksv_token_delete(token);
 
+            BOOL is_paired = FALSE;
+
             /* Consume next token. */
             token = ksv_lexer_next(lexer);
             while (token) {
@@ -102,6 +104,8 @@ KSV_STATUS ksv_parser_parse(ksv_parser_t *self, ksv_lexer_t *lexer)
                         token = ksv_lexer_next(lexer);
                     }
                     else {
+                        is_paired = TRUE;
+
                         KSV_STATUS s = ksv_parser_push(self, ast);
                         if (KSV_SUCCESS != s)
                             return s;
@@ -130,6 +134,13 @@ KSV_STATUS ksv_parser_parse(ksv_parser_t *self, ksv_lexer_t *lexer)
                     /* Keep consuming quoted string. */
                     token = ksv_lexer_next(lexer);
                 }
+            }
+
+            if (!is_paired) {
+            #if DEBUG
+                PUTERR("Parse unpaired quote");
+            #endif
+                return KSV_UNPAIRED_QUOTE;
             }
         }
         else if (token && KSV_TOKEN_DELIMETER == ksv_token_type(token)) {
