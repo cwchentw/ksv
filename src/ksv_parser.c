@@ -112,7 +112,7 @@ KSV_STATUS ksv_parser_parse(ksv_parser_t *self, ksv_lexer_t *lexer)
 
                     #if DEBUG
                         char *out = ksv_ast_string(ast);
-                        if (!ast)
+                        if (!out)
                             return KSV_NO_MEMORY;
 
                         PUTERR("Parse quoted field: -->%s<--", out);
@@ -140,6 +140,7 @@ KSV_STATUS ksv_parser_parse(ksv_parser_t *self, ksv_lexer_t *lexer)
             #if DEBUG
                 PUTERR("Parse unpaired quote");
             #endif
+                ksv_ast_delete(ast);
                 return KSV_UNPAIRED_QUOTE;
             }
         }

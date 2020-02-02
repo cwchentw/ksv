@@ -636,7 +636,6 @@ KSV_STATUS ksv_load_record(ksv_t *self, FILE *stream)
 
                     more_buf = realloc(buf, buffer_width);
 
-
                     if (!more_buf) {
                     #if DEBUG
                         PUTERR("Failed to allocate memory for C string buffer");
@@ -648,10 +647,6 @@ KSV_STATUS ksv_load_record(ksv_t *self, FILE *stream)
                     else {
                         buf = more_buf;
                     }
-
-                    buffer_offset += line_width;
-                    strcpy(buf+buffer_offset, line);
-                    buf[buffer_offset] = '\0';
                 }
 
                 strcat(buf, line);
