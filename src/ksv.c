@@ -549,7 +549,9 @@ KSV_STATUS ksv_load_record(ksv_t *self, FILE *stream)
     self->row = 0;
 
     char *line = NULL;
+    char *more_line = NULL;
     char *buf = NULL;
+    char *more_buf = NULL;
     ksv_lexer_t *lexer = NULL;
     ksv_parser_t *parser = NULL;
 
@@ -584,13 +586,17 @@ KSV_STATUS ksv_load_record(ksv_t *self, FILE *stream)
         if (line_width == strlen(line)) {
             if ('\n' != line[line_width-1]) {
                 line_width <<= 1;
-                if (!realloc(line, line_width)) {
+                more_line = realloc(line, line_width);
+                if (!more_line) {
                 #if DEBUG
                     PUTERR("Failed to realloc memory for C string");
                     PUTERR("Check available system memory");
                 #endif
                     ksv_status = KSV_NO_MEMORY;
                     goto ERROR_CSV;
+                }
+                else {
+                    line = more_line;
                 }
             }
             else {
@@ -628,28 +634,24 @@ KSV_STATUS ksv_load_record(ksv_t *self, FILE *stream)
                         buffer_width <<= 1;
                     }
 
-                    char *buf_old = buf;
-                    char *buf_new = \
-                        (char *) malloc((buffer_width + 1) * sizeof(char));
-                    if (!buf_new) {
+                    more_buf = realloc(buf, buffer_width);
+
+
+                    if (!more_buf) {
                     #if DEBUG
-                        PUTERR("Failed to allocate memory for string buffer");
+                        PUTERR("Failed to allocate memory for C string buffer");
                         PUTERR("Check available system memory");
                     #endif
                         ksv_status = KSV_NO_MEMORY;
                         goto ERROR_CSV;
                     }
-
-                    {
-                        size_t i;
-                        for (i = 0; i < strlen(buf_old); ++i)
-                            buf_new[i] = buf_old[i];
+                    else {
+                        buf = more_buf;
                     }
 
-                    buf_new[strlen(buf_old)] = '\0';
-
-                    buf = buf_new;
-                    /* free(buf_old); */
+                    buffer_offset += line_width;
+                    strcpy(buf+buffer_offset, line);
+                    buf[buffer_offset] = '\0';
                 }
 
                 strcat(buf, line);
@@ -669,7 +671,7 @@ KSV_STATUS ksv_load_record(ksv_t *self, FILE *stream)
                 buf[0] = '\0';
                 buffer_offset = 0;
             }
-            
+
             if (KSV_SUCCESS != ksv_status)
                 goto ERROR_CSV;
 
@@ -684,23 +686,24 @@ KSV_STATUS ksv_load_record(ksv_t *self, FILE *stream)
                             buffer_width <<= 1;
                         }
 
-                        if (!realloc(buf, buffer_width)) {
+                        more_buf = realloc(buf, buffer_width);
+
+                        if (!more_buf) {
                         #if DEBUG
                             PUTERR("Failed to allocate memory for C string buffer");
                             PUTERR("Check available system memory");
                         #endif
-                            return KSV_NO_MEMORY;
+                            ksv_status = KSV_NO_MEMORY;
+                            goto ERROR_CSV;
+                        }
+                        else {
+                            buf = more_buf;
                         }
 
-                        {
-                            size_t i;
-                            for (i = 0; i < strlen(line); ++i)
-                                buf[i] = line[i];
-                        }
-
+                        strcpy(buf, line);
                         buffer_offset += line_width;
                         buf[buffer_offset] = '\0';
-                
+
                     #if DEBUG
                         PUTERR("Copy string to buffer: -->%s<--", buf);
                     #endif
@@ -748,10 +751,10 @@ KSV_STATUS ksv_load_record(ksv_t *self, FILE *stream)
         #if DEBUG
             PUTERR("Buffer before inner conditional: -->%s<--", buf);
         #endif
-            /* ksv_lexer_delete(lexer); */
+            ksv_lexer_delete(lexer);
             lexer = NULL;
 
-            /* ksv_parser_delete(parser); */
+            ksv_parser_delete(parser);
             parser = NULL;
         }
 
