@@ -235,7 +235,6 @@ We copy some utility code from [cwchentw/clibs](https://github.com/cwchentw/clib
 
 ## Known Issues or Bugs
 
-* Unable to handle embedded newlines in `ksv table`
 * C file streams may not work in C++ binding
 
 ## Copyright
