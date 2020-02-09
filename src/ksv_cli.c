@@ -32,6 +32,12 @@ int main(int argc, char *argv[])
     }
 
     KSV_COMMAND_TYPE command = ksv_argument_command(arg);
+
+    if (KSV_COMMAND_UNKNOWN == command) {
+        PUTERR("Invalid command");
+        goto ERROR_KSV;
+    }
+
     switch (command) {
     case KSV_COMMAND_VERSION:
         ksv_version();
@@ -42,6 +48,12 @@ int main(int argc, char *argv[])
     case KSV_COMMAND_HELP:
         ksv_help(stdout);
         goto END_CSV;
+    }
+
+    if (KSV_COMMAND_STATS == command
+        && KSV_COMMAND_UNKNOWN == ksv_argument_subcommand(arg)) {
+        PUTERR("Invalid stats command");
+        goto ERROR_KSV;
     }
 
     const char *path = ksv_argument_path(arg);
@@ -125,6 +137,14 @@ int main(int argc, char *argv[])
         KSV_STATUS s = show_sheet(stdout, ksv);
         if (KSV_SUCCESS != s)
             goto ERROR_KSV;
+    }
+    else if (KSV_COMMAND_STATS == ksv_argument_command(arg)) {
+        if (IS_KSV_COMMAND_EQUAL(KSV_COMMAND_UNKNOWN, ksv_argument_subcommand(arg))) {
+            PUTERR("Invalid stats command");
+            goto ERROR_KSV;
+        }
+
+        /* Implement it later. */
     }
 
 END_CSV:

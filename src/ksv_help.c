@@ -16,9 +16,10 @@
 /*345678901234567890123456789012345678901234567890123456789012345678901234567890*/
 void ksv_help(FILE *stream)
 {
-    fprintf(stream, "Usage: %s [subcommand] [sheet.csv]%s", KSV_PROGRAM, END_OF_LINE);
+    fprintf(stream, "Usage: %s [command] [sheet.csv]%s", KSV_PROGRAM, END_OF_LINE);
+    fprintf(stream, "       %s stats [command] [sheet.csv]%s", KSV_PROGRAM, END_OF_LINE);
     fprintf(stream, "%s", END_OF_LINE);
-    fprintf(stream, "Subcommand:%s", END_OF_LINE);
+    fprintf(stream, "Command:%s", END_OF_LINE);
     fprintf(stream, "    version\tShow version info and exit%s", END_OF_LINE);
     fprintf(stream, "    license\tShow license info and exit%s", END_OF_LINE);
     fprintf(stream, "    help\tShow help info and exit%s", END_OF_LINE);
@@ -27,4 +28,9 @@ void ksv_help(FILE *stream)
     fprintf(stream, "    dimension\tShow the dimension of CSV sheet%s", END_OF_LINE);
     fprintf(stream, "    header\tShow the header of CSV sheet%s", END_OF_LINE);
     fprintf(stream, "    table\tShow CSV sheet as console table%s", END_OF_LINE);
+    fprintf(stream, "    stats\tBasic statistics for CSV sheet%s", END_OF_LINE);
+    fprintf(stream, "%s", END_OF_LINE);
+    fprintf(stream, "Stats command:%s", END_OF_LINE);
+    fprintf(stream, "    quartiles\tQuartiles of numerical data%s", END_OF_LINE);
+    fprintf(stream, "    quintiles\tQuintiles of numerical data%s", END_OF_LINE);
 }

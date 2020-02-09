@@ -8,6 +8,7 @@
 struct ksv_argument_t {
     char *path;
     KSV_COMMAND_TYPE command;
+    KSV_COMMAND_TYPE subcommand;
 };
 
 static ksv_argument_t * ksv_argument_new(void);
@@ -48,6 +49,22 @@ ksv_argument_t * ksv_argument_parse(int argc, char *argv[])
             else if (0 == strcmp("table", argv[i])) {
                 arg->command = KSV_COMMAND_SHOW;
             }
+            else if (0 == strcmp("stats", argv[i])) {
+                if (i + 1 >= argc) {
+                    break;
+                }
+
+                arg->command = KSV_COMMAND_STATS;
+
+                if (0 == strcmp("quartiles", argv[i+1])) {
+                    arg->subcommand = KSV_STATS_COMMAND_QUARTILES;
+                    i += 1;
+                }
+                else if (0 == strcmp("quintiles", argv[i+1])) {
+                    arg->subcommand = KSV_STATS_COMMAND_QUINTILES;
+                    i += 1;
+                }
+            }
             else {
                 arg->path = argv[i];
                 break;
@@ -72,6 +89,7 @@ static ksv_argument_t * ksv_argument_new(void)
 
     arg->path = NULL;
     arg->command = KSV_COMMAND_UNKNOWN;
+    arg->subcommand = KSV_COMMAND_UNKNOWN;
 
     return arg;
 }
@@ -88,6 +106,13 @@ KSV_COMMAND_TYPE ksv_argument_command(ksv_argument_t *self)
     assert(self);
 
     return self->command;
+}
+
+KSV_COMMAND_TYPE ksv_argument_subcommand(ksv_argument_t *self)
+{
+    assert(self);
+
+    return self->subcommand;
 }
 
 char * ksv_argument_path(ksv_argument_t *self)
