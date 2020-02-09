@@ -95,12 +95,12 @@ ifneq (,$(findstring $(CC),$(CL)))
 	OBJS=cstring.obj ksv_token.obj ksv_lexer.obj \
 		ksv_ast.obj ksv_parser.obj ksv.obj
 	OBJS_CPP=$(OBJS) ksvpp.obj
-	EXEC_OBJS=ksv_help.obj ksv_argument.obj ksv_cli.obj
+	EXEC_OBJS=ksv_help.obj ksv_argument.obj arrayd.obj ksv_cli.obj
 else
 	OBJS=cstring.o ksv_token.o ksv_lexer.o \
 		ksv_ast.o ksv_parser.o ksv.o
 	OBJS_CPP=$(OBJS) ksvpp.o
-	EXEC_OBJS=ksv_help.o ksv_argument.o ksv_cli.o
+	EXEC_OBJS=ksv_help.o ksv_argument.o arrayd.o ksv_cli.o
 endif
 
 DYNAMIC := dynamic dynamic-cpp
