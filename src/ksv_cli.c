@@ -10,7 +10,7 @@
 #include "print.h"
 
 KSV_STATUS show_sheet(FILE *stream, ksv_t *ksv);
-KSV_STATUS show_quartile(ksv_t *ksv, FILE* in);
+KSV_STATUS show_quartiles(ksv_t *ksv, FILE* in);
 
 #define CHECK_DIMENSION(cmd) \
     ((cmd) == KSV_COMMAND_WIDTH \
@@ -149,7 +149,7 @@ int main(int argc, char *argv[])
         }
         else if (IS_KSV_COMMAND_EQUAL(
             KSV_STATS_COMMAND_QUARTILES, ksv_argument_subcommand(arg))) {
-            if (KSV_SUCCESS != show_quartile(ksv, fp)) {
+            if (KSV_SUCCESS != show_quartiles(ksv, fp)) {
                 goto ERROR_KSV;
             }
         }
@@ -428,7 +428,7 @@ KSV_STATUS show_sheet(FILE *stream, ksv_t *ksv)
     return KSV_SUCCESS;
 }
 
-KSV_STATUS show_quartile(ksv_t *ksv, FILE* in)
+KSV_STATUS show_quartiles(ksv_t *ksv, FILE* in)
 {
     KSV_STATUS status = ksv_load_header(ksv, in);
     if (KSV_SUCCESS != status) {
