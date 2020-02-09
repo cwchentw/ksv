@@ -11,6 +11,7 @@
 
 KSV_STATUS show_sheet(FILE *stream, ksv_t *ksv);
 KSV_STATUS show_quartiles(ksv_t *ksv, FILE* in);
+KSV_STATUS show_quintiles(ksv_t *ksv, FILE* in);
 
 #define CHECK_DIMENSION(cmd) \
     ((cmd) == KSV_COMMAND_WIDTH \
@@ -150,6 +151,12 @@ int main(int argc, char *argv[])
         else if (IS_KSV_COMMAND_EQUAL(
             KSV_STATS_COMMAND_QUARTILES, ksv_argument_subcommand(arg))) {
             if (KSV_SUCCESS != show_quartiles(ksv, fp)) {
+                goto ERROR_KSV;
+            }
+        }
+        else if (IS_KSV_COMMAND_EQUAL(
+            KSV_STATS_COMMAND_QUINTILES, ksv_argument_subcommand(arg))) {
+            if (KSV_SUCCESS != show_quintiles(ksv, fp)) {
                 goto ERROR_KSV;
             }
         }
@@ -569,6 +576,197 @@ KSV_STATUS show_quartiles(ksv_t *ksv, FILE* in)
                         if (!q[3]) {
                             PUTS("     75%%: %f", arrayd_at(arr[i], j));
                             q[3] = TRUE;
+                        }
+                    }
+                    else if (j == n - 1) {
+                        PUTS("    100%%: %f", arrayd_at(arr[i], j));
+                    }
+                }
+            }
+
+            if (i < col - 1)
+                PUTS("");
+        }
+    }
+
+    {
+        size_t i;
+        for (i = 0; i < col; ++i)
+            arrayd_delete(arr[i]);
+
+        free(arr);
+    }
+
+    free(is_valid);
+    free(headers);
+
+    return KSV_SUCCESS;
+
+ERROR_KSV:
+    if (arr) {
+        size_t i;
+        for (i = 0; i < col; ++i)
+            arrayd_delete(arr[i]);
+
+        free(arr);
+    }
+
+    if (is_valid)
+        free(is_valid);
+
+    if (headers)
+        free(headers);
+
+    return status;
+}
+
+KSV_STATUS show_quintiles(ksv_t *ksv, FILE* in)
+{
+    KSV_STATUS status = ksv_load_header(ksv, in);
+    if (KSV_SUCCESS != status) {
+        return status;
+    }
+
+    size_t col = ksv_col(ksv);
+
+    char **headers = NULL;
+    BOOL *is_valid = NULL;
+    arrayd_t **arr = NULL;
+
+    headers = (char **) malloc(col * sizeof(char *));
+    if (!headers) {
+        status = KSV_NO_MEMORY;
+        goto ERROR_KSV;
+    }
+
+    ksv_restart(ksv);
+    {
+        size_t i;
+        for (i = 0; i < col; ++i)
+            headers[i] = ksv_next_header(ksv);
+    }
+
+    is_valid = (BOOL *) malloc(col * sizeof(BOOL));
+    if (!is_valid) {
+        return KSV_NO_MEMORY;
+    }
+
+    {
+        size_t i;
+        for (i = 0; i < col; ++i)
+            is_valid[i] = TRUE;
+    }
+
+    arr = (arrayd_t **) malloc(col * sizeof(arrayd_t *));
+    if (!arr) {
+        free(is_valid);
+        return KSV_NO_MEMORY;
+    }
+
+    {
+        size_t i;
+        for (i = 0; i < col; ++i) {
+            arr[i] = arrayd_new();
+            if (!(arr[i])) {
+                for (i = 0; i < col; ++i) {
+                    if (arr[i])
+                        arrayd_delete(arr[i]);
+                }
+
+                return KSV_NO_MEMORY;
+            }
+        }
+    }
+
+    size_t n = 0;
+    while (!feof(in)) {
+        if (KSV_SUCCESS != ksv_load_record(ksv, in)) {
+            PUTERR("Failed to load a sheet record");
+            goto ERROR_KSV;
+        }
+
+        ksv_restart(ksv);
+
+        char *field;
+        size_t i;
+        for (i = 0; i < col; ++i) {
+            field = ksv_next_data_by_row(ksv);
+
+            if (!(is_valid[i]))
+                continue;
+
+            char *ptr;
+            double result = strtod(field, &ptr);
+
+            if (0 == result) {
+                if (errno == ERANGE || ptr) {
+                    is_valid[i] = FALSE;
+                }
+            }
+
+            if (!arrayd_push(arr[i], result)) {
+                status = KSV_FAILURE;
+                goto ERROR_KSV;
+            }
+        }
+
+        ++n;
+    }
+
+    if (n < 5) {
+        PUTERR("Too few data to show");
+        status = KSV_FAILURE;
+        goto ERROR_KSV;
+    }
+
+    {
+        size_t i;
+        for (i = 0; i < col; ++i)
+            arrayd_sort(arr[i]);
+    }
+
+    {
+        size_t i;
+        for (i = 0; i < col; ++i) {
+            PUTS("%lu:%s", i+1, headers[i]);
+
+            if (!is_valid[i]) {
+                PUTS("    Not numerical");
+            }
+            else {
+                size_t j;
+                BOOL q[] = {FALSE, FALSE, FALSE, FALSE, FALSE};
+                for (j = 0; j < n; ++j) {
+                    double ratio = ((double) j) / ((double) n - 1);
+
+                    if (ratio < 0.2) {
+                        if (!q[0]) {
+                            PUTS("      0%%: %f", arrayd_at(arr[i], j));
+                            q[0] = TRUE;
+                        }
+                    }
+                    else if (ratio < 0.4) {
+                        if (!q[1]) {
+                            PUTS("     20%%: %f", arrayd_at(arr[i], j));
+                            q[1] = TRUE;
+                        }
+                    }
+                    else if (ratio < 0.6) {
+                        if (!q[2]) {
+                            PUTS("     40%%: %f", arrayd_at(arr[i], j));
+                            q[2] = TRUE;
+                        }
+                    }
+                    else if (ratio < 0.8) {
+                        if (!q[3]) {
+                            PUTS("     60%%: %f", arrayd_at(arr[i], j));
+                            q[3] = TRUE;
+                        }
+                    }
+                    else if (ratio < 1.0) {
+                        if (!q[4]) {
+                            PUTS("     80%%: %f", arrayd_at(arr[i], j));
+                            q[4] = TRUE;
                         }
                     }
                     else if (j == n - 1) {
