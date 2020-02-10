@@ -215,7 +215,7 @@ Show the count of the records (or rows) of a CSV sheet:
 $ ksv height path/to/sheet.csv
 ```
 
-Show the dimension of a CSV sheet:
+Show the dimension (維度) of a CSV sheet:
 
 ```console
 $ ksv dimension path/to/sheet.csv
@@ -227,13 +227,13 @@ Show a console table of a CSV sheet:
 $ ksv table path/to/sheet.csv
 ```
 
-Show the quartiles of a CSV sheet:
+Show the quartiles (四分位數) of a CSV sheet:
 
 ```console
 $ ksv stats quartiles path/to/sheet.csv
 ```
 
-Show the quintiles of a CSV sheet:
+Show the quintiles (五分位數) of a CSV sheet:
 
 ```console
 $ ksv stats quintiles path/to/sheet.csv
