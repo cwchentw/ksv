@@ -93,7 +93,7 @@ endif
 DYNAMIC := dynamic dynamic-cpp
 
 
-.PHONY: all dynamic dynamic-cpp static static-cpp exec clean_obj clean
+.PHONY: all dynamic dynamic-cpp static static-cpp exec clean-obj clean
 
 all: dynamic
 
@@ -180,7 +180,7 @@ else
 	$(CXX) -c $< $(CXXFLAGS)
 endif
 
-clean_obj:
+clean-obj:
 	$(RM) $(OBJS_CPP)
 
 clean:

@@ -1,4 +1,3 @@
-* Support `make install`
 * Add automated tests for `ksv` cli utility
 * Add subcommand
   * `stats`: basic statistics for CSV data
