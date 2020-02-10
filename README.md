@@ -28,6 +28,18 @@ We test **ksv** against several Unix or Unix-like systems:
 
 In addition, we test **ksv** against Windows 10 as well.
 
+## Install
+
+Install **ksv** with [Homebrew](https://brew.sh/) on macOS:
+
+```
+$ git clone https://github.com/cwchentw/ksv.git
+$ cd ksv
+$ brew install --HEAD ksv.rb
+```
+
+RPM and DEB is on the way.
+
 ## Build the Project:
 
 By default, the project is built into a dynamic library:
