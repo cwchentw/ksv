@@ -17,19 +17,6 @@ ifeq ($(detected_OS),Windows)
 	RM=del /q /f
 endif
 
-CC=
-ifeq (,$(CC))
-ifeq ($(detected_OS),Windows)
-	CC=cl.exe
-else
-ifeq ($(detected_OS),Darwin)
-	CC=clang
-else
-	CC=gcc
-endif  # Darwin
-endif  # Windows
-endif  # CC
-
 ifeq ($(detected_OS),Windows)
 	TARGET=ksv.exe
 else

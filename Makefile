@@ -4,6 +4,22 @@ else
     detected_OS := $(shell sh -c 'uname -s 2>/dev/null || echo not')
 endif
 
+# Set default C compiler.
+# Clean implict CC variable.
+CC=
+
+ifndef CC
+	ifeq ($(detected_OS),Windows)
+		CC=cl
+	else ifeq ($(detected_OS),Darwin)
+		CC=clang
+	else
+		CC=gcc
+	endif
+endif  # CC
+
+export CC
+
 ifeq ($(detected_OS),Windows)
 	SEP=\\
 else
