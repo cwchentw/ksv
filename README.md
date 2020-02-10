@@ -38,7 +38,7 @@ $ cd ksv
 $ brew install --HEAD ksv.rb
 ```
 
-RPM and DEB is on the way.
+RPM and DEB are on the way.
 
 ## Build the Project:
 
