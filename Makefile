@@ -72,6 +72,9 @@ install:
 ifeq ($(detected_OS),Windows)
 	echo "Not supported"
 else
+	mkdir -p $(bindir)
+	mkdir -p $(includedir)
+	mkdir -p $(libdir)
 	install -C include/ksv.h $(includedir)
 	if [ -e dist/ksv ]; then install -C dist/ksv $(bindir); fi
 	if [ -e dist/libksv.a ]; then install -C dist/libksv.a $(libdir); fi
@@ -83,6 +86,8 @@ install-cpp:
 ifeq ($(detected_OS),Windows)
 	echo "Not supported"
 else
+	mkdir -p $(includedir)
+	mkdir -p $(libdir)
 	install -C include/ksv.hpp $(includedir)
 	if [ -e dist/libksvpp.a ]; then install -C dist/libksvpp.a $(libdir); fi
 	if [ -e dist/libksvpp.so ]; then install -C dist/libksvpp.so $(libdir); fi
