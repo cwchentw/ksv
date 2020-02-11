@@ -30,13 +30,26 @@ In addition, we test **ksv** against Windows 10 as well.
 
 ## Install
 
-Install **ksv** with [Homebrew](https://brew.sh/) on macOS:
+On macOS, install **ksv** with [Homebrew](https://brew.sh/):
 
 ```
 $ git clone https://github.com/cwchentw/ksv.git
 $ cd ksv
 $ brew install --HEAD ksv.rb
 ```
+
+On Unix, install **ksv** with the following commands:
+
+```
+$ git clone https://github.com/cwchentw/ksv.git
+$ cd ksv
+$ make
+$ make clean-obj
+$ make exec
+$ sudo make install
+```
+
+By default, **ksv** will be installed at */usr/local*. Use `prefix` variable to set custom location.
 
 RPM and DEB are on the way.
 
