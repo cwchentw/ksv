@@ -57,6 +57,19 @@ $ sudo make install prefix=/opt
 
 RPM and DEB are on the way.
 
+To install our experimental C++ binding, invoke the following commands:
+
+```console
+$ git clone https://github.com/cwchentw/ksv.git
+$ cd ksv
+$ make dynamic-cpp
+$ make clean-obj
+$ make static-cpp
+$ sudo make install-cpp
+```
+
+There are still some I/O related issue in the C++ binding. Hence, we won't package the binding now. Use it at your own risk.
+
 ## Build the Project:
 
 By default, the project is built into a dynamic library:
