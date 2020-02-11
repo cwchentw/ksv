@@ -49,7 +49,11 @@ $ make exec
 $ sudo make install
 ```
 
-By default, **ksv** will be installed at */usr/local*. Use `prefix` variable to set custom location.
+By default, **ksv** will be installed at */usr/local*. Use `prefix` variable to set custom location:
+
+```
+$ sudo make install prefix=/opt
+```
 
 RPM and DEB are on the way.
 
