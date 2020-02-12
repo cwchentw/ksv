@@ -536,7 +536,7 @@ KSV_STATUS show_deviation(ksv_t *ksv, FILE *in)
         ++n;
     }
 
-    if (n < 2) {
+    if (n < 30) {
         PUTERR("Too few data to show");
         status = KSV_FAILURE;
         goto ERROR_KSV;
