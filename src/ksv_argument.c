@@ -56,7 +56,11 @@ ksv_argument_t * ksv_argument_parse(int argc, char *argv[])
 
                 arg->command = KSV_COMMAND_STATS;
 
-                if (0 == strcmp("quartiles", argv[i+1])) {
+                if (0 == strcmp("deviation", argv[i+1])) {
+                    arg->subcommand = KSV_STATS_COMMAND_DEVIATION;
+                    i += 1;
+                }
+                else if (0 == strcmp("quartiles", argv[i+1])) {
                     arg->subcommand = KSV_STATS_COMMAND_QUARTILES;
                     i += 1;
                 }

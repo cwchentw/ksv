@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,8 +11,9 @@
 #include "print.h"
 
 KSV_STATUS show_sheet(FILE *stream, ksv_t *ksv);
-KSV_STATUS show_quartiles(ksv_t *ksv, FILE* in);
-KSV_STATUS show_quintiles(ksv_t *ksv, FILE* in);
+KSV_STATUS show_deviation(ksv_t *ksv, FILE *in);
+KSV_STATUS show_quartiles(ksv_t *ksv, FILE *in);
+KSV_STATUS show_quintiles(ksv_t *ksv, FILE *in);
 
 #define CHECK_DIMENSION(cmd) \
     ((cmd) == KSV_COMMAND_WIDTH \
@@ -147,6 +149,12 @@ int main(int argc, char *argv[])
             KSV_COMMAND_UNKNOWN, ksv_argument_subcommand(arg))) {
             PUTERR("Invalid stats command");
             goto ERROR_KSV;
+        }
+        else if (IS_KSV_COMMAND_EQUAL(
+            KSV_STATS_COMMAND_DEVIATION, ksv_argument_subcommand(arg))) {
+            if (KSV_SUCCESS != show_deviation(ksv, fp)) {
+                goto ERROR_KSV;
+            }
         }
         else if (IS_KSV_COMMAND_EQUAL(
             KSV_STATS_COMMAND_QUARTILES, ksv_argument_subcommand(arg))) {
@@ -435,7 +443,177 @@ KSV_STATUS show_sheet(FILE *stream, ksv_t *ksv)
     return KSV_SUCCESS;
 }
 
-KSV_STATUS show_quartiles(ksv_t *ksv, FILE* in)
+KSV_STATUS show_deviation(ksv_t *ksv, FILE *in)
+{
+    KSV_STATUS status = ksv_load_header(ksv, in);
+    if (KSV_SUCCESS != status) {
+        return status;
+    }
+
+    size_t col = ksv_col(ksv);
+
+    char **headers = NULL;
+    BOOL *is_valid = NULL;
+    arrayd_t **arr = NULL;
+
+    headers = (char **) malloc(col * sizeof(char *));
+    if (!headers) {
+        status = KSV_NO_MEMORY;
+        goto ERROR_KSV;
+    }
+
+    ksv_restart(ksv);
+    {
+        size_t i;
+        for (i = 0; i < col; ++i)
+            headers[i] = ksv_next_header(ksv);
+    }
+
+    is_valid = (BOOL *) malloc(col * sizeof(BOOL));
+    if (!is_valid) {
+        return KSV_NO_MEMORY;
+    }
+
+    {
+        size_t i;
+        for (i = 0; i < col; ++i)
+            is_valid[i] = TRUE;
+    }
+
+    arr = (arrayd_t **) malloc(col * sizeof(arrayd_t *));
+    if (!arr) {
+        free(is_valid);
+        return KSV_NO_MEMORY;
+    }
+
+    {
+        size_t i;
+        for (i = 0; i < col; ++i) {
+            arr[i] = arrayd_new();
+            if (!(arr[i])) {
+                for (i = 0; i < col; ++i) {
+                    if (arr[i])
+                        arrayd_delete(arr[i]);
+                }
+
+                return KSV_NO_MEMORY;
+            }
+        }
+    }
+
+    size_t n = 0;
+    while (!feof(in)) {
+        if (KSV_SUCCESS != ksv_load_record(ksv, in)) {
+            PUTERR("Failed to load a sheet record");
+            goto ERROR_KSV;
+        }
+
+        ksv_restart(ksv);
+
+        char *field;
+        size_t i;
+        for (i = 0; i < col; ++i) {
+            field = ksv_next_data_by_row(ksv);
+
+            if (!(is_valid[i]))
+                continue;
+
+            char *ptr;
+            double result = strtod(field, &ptr);
+
+            if (0 == result) {
+                if (errno == ERANGE || ptr) {
+                    is_valid[i] = FALSE;
+                }
+            }
+
+            if (!arrayd_push(arr[i], result)) {
+                status = KSV_FAILURE;
+                goto ERROR_KSV;
+            }
+        }
+
+        ++n;
+    }
+
+    if (n < 2) {
+        PUTERR("Too few data to show");
+        status = KSV_FAILURE;
+        goto ERROR_KSV;
+    }
+
+    {
+        size_t i;
+        for (i = 0; i < col; ++i) {
+            PUTS("%lu:%s", i+1, headers[i]);
+            if (!is_valid[i]) {
+                PUTS("    Not numerical");
+                continue;
+            }
+
+            double sum = 0.0;
+            {
+                size_t j;
+                for (j = 0; j < n; ++j)
+                    sum += arrayd_at(arr[i], j);
+            }
+
+            double mean = sum / n;
+
+            double sqr = 0.0;
+            {
+                size_t j;
+                for (j = 0; j < n; ++j) {
+                    double temp = arrayd_at(arr[i], j) - mean;
+                    sqr += temp * temp;
+                }
+            }
+
+            double sd = sqrt(sqr / (n - 1));
+
+            PUTS("   -2 SD: %f", mean - 2 * sd);
+            PUTS("   -1 SD: %f", mean - sd);
+            PUTS("    mean: %f", mean);
+            PUTS("   +1 SD: %f", mean + sd);
+            PUTS("   +2 SD: %f", mean + 2 * sd);
+
+            if (i < col - 1)
+                PUTS("");
+        }
+    }
+
+    {
+        size_t i;
+        for (i = 0; i < col; ++i)
+            arrayd_delete(arr[i]);
+
+        free(arr);
+    }
+
+    free(is_valid);
+    free(headers);
+
+    return KSV_SUCCESS;
+
+ERROR_KSV:
+    if (arr) {
+        size_t i;
+        for (i = 0; i < col; ++i)
+            arrayd_delete(arr[i]);
+
+        free(arr);
+    }
+
+    if (is_valid)
+        free(is_valid);
+
+    if (headers)
+        free(headers);
+
+    return status;
+}
+
+KSV_STATUS show_quartiles(ksv_t *ksv, FILE *in)
 {
     KSV_STATUS status = ksv_load_header(ksv, in);
     if (KSV_SUCCESS != status) {
@@ -620,7 +798,7 @@ ERROR_KSV:
     return status;
 }
 
-KSV_STATUS show_quintiles(ksv_t *ksv, FILE* in)
+KSV_STATUS show_quintiles(ksv_t *ksv, FILE *in)
 {
     KSV_STATUS status = ksv_load_header(ksv, in);
     if (KSV_SUCCESS != status) {

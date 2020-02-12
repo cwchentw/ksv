@@ -14,8 +14,9 @@ typedef unsigned char KSV_COMMAND_TYPE;
 #define  KSV_COMMAND_SHOW       8
 #define  KSV_COMMAND_STATS      9
 
-#define  KSV_STATS_COMMAND_QUARTILES  1
-#define  KSV_STATS_COMMAND_QUINTILES  2
+#define  KSV_STATS_COMMAND_DEVIATION  1
+#define  KSV_STATS_COMMAND_QUARTILES  2
+#define  KSV_STATS_COMMAND_QUINTILES  3
 
 #define IS_KSV_COMMAND_EQUAL(a, b) (!((a) ^ (b)))
 
