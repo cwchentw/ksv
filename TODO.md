@@ -1,4 +1,3 @@
-* Add standard deviation based range (`ksv stats deviation`)
 * Add `ksv head`
 * Add `ksv tail`
 * Import CSV data into `ksv` with Unix pipe
