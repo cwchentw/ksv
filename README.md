@@ -14,7 +14,7 @@ This app neither guarantees any damage or loss from using it nor recommends any 
 * GNU Make
 * Valgrind (only for tests on GNU/Linux)
 
-To use GNU Make on non-Linux Unix or Unix-like systems, use `gmake` instead of `make`. To use GNU Make on Windows, use `mingw32-make`.
+To use GNU Make on Unix other than GNU/Linux, use `gmake` instead of `make`. To use GNU Make on Windows, use `mingw32-make`.
 
 We compile and run **ksv** with GCC, Clang, Visual C++ and Intel C++ Compiler.
 
