@@ -730,7 +730,7 @@ KSV_STATUS show_quartiles(ksv_t *ksv, FILE *in)
                 size_t j;
                 BOOL q[] = {FALSE, FALSE, FALSE, FALSE};
                 for (j = 0; j < n; ++j) {
-                    double ratio = ((double) j) / ((double) n - 1);
+                    double ratio = ((double) j+1) / ((double) n);
 
                     if (ratio < 0.25) {
                         if (!q[0]) {
@@ -915,7 +915,7 @@ KSV_STATUS show_quintiles(ksv_t *ksv, FILE *in)
                 size_t j;
                 BOOL q[] = {FALSE, FALSE, FALSE, FALSE, FALSE};
                 for (j = 0; j < n; ++j) {
-                    double ratio = ((double) j) / ((double) n - 1);
+                    double ratio = ((double) j+1) / ((double) n);
 
                     if (ratio < 0.2) {
                         if (!q[0]) {
