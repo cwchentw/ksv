@@ -79,6 +79,14 @@ else
 endif
 
 ifneq (,$(findstring $(CC),$(CL)))
+	LDFLAGS=
+	LIBS=
+else
+	LDFLAGS=
+	LIBS=-lm
+endif
+
+ifneq (,$(findstring $(CC),$(CL)))
 	OBJS=cstring.obj ksv_token.obj ksv_lexer.obj \
 		ksv_ast.obj ksv_parser.obj ksv.obj
 	OBJS_CPP=$(OBJS) ksvpp.obj
@@ -103,7 +111,7 @@ $(LIB_DYNAMIC): $(OBJS)
 ifneq (,$(findstring $(CC),$(CL)))
 	link /DLL /OUT:..$(SEP)$(DIST_DIR)$(SEP)$(LIB_DYNAMIC) $(OBJS)
 else
-	$(CC) -shared -o ..$(SEP)$(DIST_DIR)$(SEP)$(LIB_DYNAMIC) $(OBJS)
+	$(CC) -shared -o ..$(SEP)$(DIST_DIR)$(SEP)$(LIB_DYNAMIC) $(OBJS) $(LDFLAGS) $(LIBS)
 endif
 
 dynamic-cpp: $(LIB_DYNAMIC_CPP)
@@ -112,7 +120,7 @@ $(LIB_DYNAMIC_CPP): $(OBJS_CPP)
 ifneq (,$(findstring $(CC),$(CL)))
 	link /DLL /OUT:..$(SEP)$(DIST_DIR)$(SEP)$(LIB_DYNAMIC_CPP) $(OBJS_CPP)
 else
-	$(CXX) -shared -o ..$(SEP)$(DIST_DIR)$(SEP)$(LIB_DYNAMIC_CPP) $(OBJS_CPP)
+	$(CXX) -shared -o ..$(SEP)$(DIST_DIR)$(SEP)$(LIB_DYNAMIC_CPP) $(OBJS_CPP) $(LDFLAGS) $(LIBS)
 endif
 
 static: $(LIB_STATIC)
@@ -146,10 +154,12 @@ exec: $(TARGET)
 $(TARGET): $(LIB_STATIC) $(EXEC_OBJS)
 ifneq (,$(findstring $(CC),$(CL)))
 	$(CC) /Fe:..$(SEP)$(DIST_DIR)$(SEP)$(TARGET) $(EXEC_OBJS) \
-		..$(SEP)$(DIST_DIR)$(SEP)$(LIB_STATIC) $(CFLAGS)
+		..$(SEP)$(DIST_DIR)$(SEP)$(LIB_STATIC) $(CFLAGS) \
+		$(LDFLAGS) $(LIBS)
 else
 	$(CC) -o ..$(SEP)$(DIST_DIR)$(SEP)$(TARGET) $(EXEC_OBJS) \
-		..$(SEP)$(DIST_DIR)$(SEP)$(LIB_STATIC) $(CFLAGS)
+		..$(SEP)$(DIST_DIR)$(SEP)$(LIB_STATIC) $(CFLAGS) \
+		$(LDFLAGS) $(LIBS)
 endif
 
 %.obj: %.c
