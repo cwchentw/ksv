@@ -14,7 +14,7 @@ This app neither guarantees any damage or loss from using it nor recommends any 
 * GNU Make
 * Valgrind (only for tests on GNU/Linux)
 
-To use GNU Make on Unix other than GNU/Linux, use `gmake` instead of `make`. To use GNU Make on Windows, use `mingw32-make`.
+To use GNU Make on Unix other than GNU/Linux, use `gmake` instead of `make`. To use GNU Make on Windows, use `mingw32-make` instead. For Windows users, get GNU Make from either [MSYS2](https://www.msys2.org/) or [GnuWin32](http://gnuwin32.sourceforge.net/).
 
 We compile and run **ksv** with GCC, Clang, Visual C++ and Intel C++ Compiler.
 
@@ -291,7 +291,7 @@ $ ksv help
 
 Currently, **ksv** is distributed mainly as a C library. The `ksv` cli tool is just a byproduct of the library, not a feature-rich CSV or TSV tool.
 
-We copy some utility code from [cwchentw/clibs](https://github.com/cwchentw/clibs).
+We copy some utility code from [clibs](https://github.com/cwchentw/clibs).
 
 ## Known Issues or Bugs
 
