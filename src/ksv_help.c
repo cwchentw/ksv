@@ -32,6 +32,6 @@ void ksv_help(FILE *stream)
     fprintf(stream, "%s", END_OF_LINE);
     fprintf(stream, "Stats command:%s", END_OF_LINE);
     fprintf(stream, "    deviation\tDeviation of numerical data%s", END_OF_LINE);
-    fprintf(stream, "    quartiles\tQuartiles of numerical data%s", END_OF_LINE);
-    fprintf(stream, "    quintiles\tQuintiles of numerical data%s", END_OF_LINE);
+    fprintf(stream, "    quartile\tQuartiles of numerical data%s", END_OF_LINE);
+    fprintf(stream, "    quintile\tQuintiles of numerical data%s", END_OF_LINE);
 }
