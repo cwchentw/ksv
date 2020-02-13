@@ -24,7 +24,6 @@ We test **ksv** against several Unix or Unix-like systems:
 * CentOS 8
 * openSUSE Leap 15.1
 * TrueOS, which is FreeBSD-compatible
-* Solaris 11
 
 In addition, we test **ksv** against Windows 10 as well.
 
