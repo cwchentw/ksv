@@ -272,13 +272,13 @@ $ ksv table path/to/sheet.csv
 Show the quartiles (四分位數) of a CSV sheet:
 
 ```console
-$ ksv stats quartiles path/to/sheet.csv
+$ ksv stats quartile path/to/sheet.csv
 ```
 
 Show the quintiles (五分位數) of a CSV sheet:
 
 ```console
-$ ksv stats quintiles path/to/sheet.csv
+$ ksv stats quintile path/to/sheet.csv
 ```
 
 Show the help info of **ksv**:
