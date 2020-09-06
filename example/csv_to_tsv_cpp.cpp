@@ -41,9 +41,7 @@ int main(int argc, char *argv[])
     }
     std::cout << "\b" << std::endl;
 
-    std::fflush(fp);
-
-    while (!std::feof(fp)) {
+    while (!feof(fp)) {
         if (!ksv->load_record(fp)) {
             std::cerr << "Failed to load a sheet record" << std::endl;
             goto ERROR_MAIN;
@@ -58,8 +56,6 @@ int main(int argc, char *argv[])
             field = ksv->next_data_by_row();
         }
         std::cout << "\b" << std::endl;
-
-        std::fflush(fp);
     }
 
     delete ksv;
