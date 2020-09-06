@@ -10,4 +10,3 @@
 * Fix trailing EOL issue
 * Add row number for ksv table
 * Read CSV table as hash table
-* Write load_record for C++ file stream

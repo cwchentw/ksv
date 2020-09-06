@@ -299,7 +299,7 @@ We copy some utility code from [clibs](https://github.com/cwchentw/clibs).
 ## Known Issues or Bugs
 
 * Fail on trailing EOL in a CSV sheet
-* C file streams may not work in C++ binding
+* Our C++ binding may fail on G++
 * `ksv table` cannot handle EOL within fields well
 
 ## Copyright
