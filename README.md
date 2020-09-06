@@ -22,14 +22,13 @@ To use GNU Make on Unix other than GNU/Linux, use `gmake` instead of `make`. To 
 
 We compile and run **ksv** with GCC, Clang, Visual C++ and Intel C++ Compiler.
 
-We test **ksv** against several Unix or Unix-like systems:
+We test **ksv** against the following platforms:
 
+* Windows 10
 * Ubuntu 18.04 LTS
 * CentOS 8
 * openSUSE Leap 15.1
 * TrueOS, which is FreeBSD-compatible
-
-In addition, we test **ksv** against Windows 10 as well.
 
 ## Install
 
