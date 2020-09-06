@@ -165,6 +165,8 @@ KSV_STATUS ksv_lexer_lex(ksv_lexer_t *self, char *input)
             }
             else {
             LEX_STRING:
+                /* FIXME: Failed to lex a string
+                     when called from a C++ program. */
                 for (j = i; j < strlen(input); ++j) {
                     size_t k;
                     BOOL is_eol = TRUE;
