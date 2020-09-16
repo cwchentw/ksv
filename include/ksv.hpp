@@ -27,12 +27,6 @@
     #define KSV_PRIVATE
 #endif
 
-#ifdef __cplusplus
-    #include <cstdio>
-#else
-    #include <stdio.h>
-#endif
-
 #include <cstdio>
 #include <iostream>
 
