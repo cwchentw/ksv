@@ -23,7 +23,7 @@ void ksv_help(FILE *stream)
     fprintf(stream, "    version\tShow version info and exit%s", END_OF_LINE);
     fprintf(stream, "    license\tShow license info and exit%s", END_OF_LINE);
     fprintf(stream, "    help\tShow help info and exit%s", END_OF_LINE);
-    fprintf(stream, "    weight\tShow the width of CSV sheet%s", END_OF_LINE);
+    fprintf(stream, "    width\tShow the width of CSV sheet%s", END_OF_LINE);
     fprintf(stream, "    height\tShow the height of CSV sheet%s", END_OF_LINE);
     fprintf(stream, "    dimension\tShow the dimension of CSV sheet%s", END_OF_LINE);
     fprintf(stream, "    header\tShow the header of CSV sheet%s", END_OF_LINE);
