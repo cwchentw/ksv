@@ -27,7 +27,7 @@ else
 endif
 
 SRC_DIR=src
-EXAMPLE_DIR=example
+EXAMPLE_DIR=examples
 
 prefix=
 ifndef prefix

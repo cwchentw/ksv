@@ -109,7 +109,7 @@ Besides, copy the header files at *include* to use **ksv**.
 
 ### C API
 
-See a full example [here](/example/csv_to_tsv.c).
+See a full example [here](/examples/csv_to_tsv.c).
 
 Load a CSV sheet into a C file stream:
 
@@ -179,7 +179,7 @@ fclose(fp);
 
 ### C++ API
 
-See a full example [here](/example/csv_to_tsv_cpp.cpp).
+See a full example [here](/examples/csv_to_tsv_cpp.cpp).
 
 Load a CSV sheet into a C file stream:
 
