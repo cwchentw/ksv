@@ -16,7 +16,6 @@ We don't check our implementation rigorously. If doubtful to the results compute
 
 * A C compiler that supports ANSI C
 * GNU Make
-* Valgrind (only for tests on GNU/Linux)
 
 To use GNU Make on Unix other than GNU/Linux, use `gmake` instead of `make`. To use GNU Make on Windows, use `mingw32-make` instead. For Windows users, get GNU Make from either [MSYS2](https://www.msys2.org/) or [GnuWin32](http://gnuwin32.sourceforge.net/).
 
@@ -25,10 +24,10 @@ We compile and run **ksv** with GCC, Clang, Visual C++ and Intel C++ Compiler.
 We test **ksv** against the following platforms:
 
 * Windows 10
-* Ubuntu 18.04 LTS
-* CentOS 8
-* openSUSE Leap 15.1
-* TrueOS, which is FreeBSD-compatible
+* Ubuntu 20.04 LTS
+* Fedora 35
+* openSUSE Leap 15.3
+* FreeBSD 13.0
 
 ## Install
 
@@ -61,7 +60,7 @@ RPM and DEB are on the way.
 
 To install our experimental C++ binding, invoke the following commands:
 
-```console
+```shell
 $ git clone https://github.com/cwchentw/ksv.git
 $ cd ksv
 $ make dynamic-cpp
@@ -76,31 +75,31 @@ There are still some I/O related issue in the C++ binding. Hence, we won't packa
 
 By default, the project is built into a dynamic library:
 
-```console
+```shell
 $ make
 ```
 
 Build the project into a static library:
 
-```console
+```shell
 $ make static
 ```
 
-Build the console tool, which is statically linked:
+Build the console tool, which is statically-linked:
 
-```console
+```shell
 $ make exec
 ```
 
 Build the C++ binding of the dynamic library of **ksv**:
 
-```console
+```shell
 $ make dynamic-cpp
 ```
 
 Build the C++ binding of the static library of **ksv**:
 
-```console
+```shell
 $ make static-cpp
 ```
 
@@ -249,43 +248,43 @@ fclose(fp);
 
 Show the count of the columns of a CSV sheet:
 
-```console
+```shell
 $ ksv width path/to/sheet.csv
 ```
 
 Show the count of the records (or rows) of a CSV sheet:
 
-```console
+```shell
 $ ksv height path/to/sheet.csv
 ```
 
 Show the dimension (維度) of a CSV sheet:
 
-```console
+```shell
 $ ksv dimension path/to/sheet.csv
 ```
 
 Show a console table of a CSV sheet:
 
-```console
+```shell
 $ ksv table path/to/sheet.csv
 ```
 
 Show the quartiles (四分位數) of a CSV sheet:
 
-```console
+```shell
 $ ksv stats quartile path/to/sheet.csv
 ```
 
 Show the quintiles (五分位數) of a CSV sheet:
 
-```console
+```shell
 $ ksv stats quintile path/to/sheet.csv
 ```
 
 Show the help info of **ksv**:
 
-```console
+```shell
 $ ksv help
 ```
 
@@ -299,8 +298,8 @@ We copy some utility code from [clibs](https://github.com/cwchentw/clibs).
 
 * Fail on trailing EOL in a CSV sheet
 * Our C++ binding may fail on some C++ compilers
-* `ksv table` cannot handle EOL within fields well
+* `ksv table` cannot handle newline within fields well
 
 ## Copyright
 
-Copyright (c) 2020 Michael Chen. Licensed under MIT.
+Copyright (c) 2020 Michelle Chen. Licensed under MIT.
