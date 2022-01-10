@@ -1,6 +1,6 @@
 /** @file       print.h
  *  @brief      Console printing related macros
- *  @author     Michael Chen
+ *  @author     Michelle Chen
  *  @copyright  MIT
  *
  * The macro definition seen in this document represent the platform data of Unix.
@@ -15,13 +15,7 @@
 #endif
 
 #ifndef END_OF_LINE
-    #if _WIN32
-        #define END_OF_LINE  "\r\n"
-    #elif __unix__ || __APPLE__
-        #define END_OF_LINE  "\n"
-    #else
-        #error "Unsupported"
-    #endif
+    #define END_OF_LINE  "\n"
 #endif
 
 /** @def   PRINT(format, ...)
