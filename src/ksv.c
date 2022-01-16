@@ -148,7 +148,7 @@ size_t ksv_col(ksv_t *self)
     return self->col;
 }
 
-void ksv_restart(ksv_t *self)
+void ksv_start(ksv_t *self)
 {
     assert(self);
 

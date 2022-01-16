@@ -197,7 +197,7 @@ ERROR_KSV:
 
 KSV_STATUS show_sheet(FILE *stream, ksv_t *ksv)
 {
-    ksv_restart(ksv);
+    ksv_start(ksv);
 
     size_t *ss = (size_t *) malloc(ksv_col(ksv) * sizeof(size_t));
     if (!ss)
@@ -289,7 +289,7 @@ KSV_STATUS show_sheet(FILE *stream, ksv_t *ksv)
 
     /* Print header if it exists. */
     if (ksv_has_header(ksv)) {
-        ksv_restart(ksv);
+        ksv_start(ksv);
 
         line[0] = '|';  /* First vertial line. */
         line[1] = '\0';
@@ -348,7 +348,7 @@ KSV_STATUS show_sheet(FILE *stream, ksv_t *ksv)
 
     /* Print data. */
     {
-        ksv_restart(ksv);
+        ksv_start(ksv);
 
         BOOL is_row_valid = TRUE;
         while (is_row_valid) {
@@ -462,7 +462,7 @@ KSV_STATUS show_deviation(ksv_t *ksv, FILE *in)
         goto ERROR_KSV;
     }
 
-    ksv_restart(ksv);
+    ksv_start(ksv);
     {
         size_t i;
         for (i = 0; i < col; ++i)
@@ -508,7 +508,7 @@ KSV_STATUS show_deviation(ksv_t *ksv, FILE *in)
             goto ERROR_KSV;
         }
 
-        ksv_restart(ksv);
+        ksv_start(ksv);
 
         char *field;
         size_t i;
@@ -632,7 +632,7 @@ KSV_STATUS show_quartiles(ksv_t *ksv, FILE *in)
         goto ERROR_KSV;
     }
 
-    ksv_restart(ksv);
+    ksv_start(ksv);
     {
         size_t i;
         for (i = 0; i < col; ++i)
@@ -678,7 +678,7 @@ KSV_STATUS show_quartiles(ksv_t *ksv, FILE *in)
             goto ERROR_KSV;
         }
 
-        ksv_restart(ksv);
+        ksv_start(ksv);
 
         char *field;
         size_t i;
@@ -817,7 +817,7 @@ KSV_STATUS show_quintiles(ksv_t *ksv, FILE *in)
         goto ERROR_KSV;
     }
 
-    ksv_restart(ksv);
+    ksv_start(ksv);
     {
         size_t i;
         for (i = 0; i < col; ++i)
@@ -863,7 +863,7 @@ KSV_STATUS show_quintiles(ksv_t *ksv, FILE *in)
             goto ERROR_KSV;
         }
 
-        ksv_restart(ksv);
+        ksv_start(ksv);
 
         char *field;
         size_t i;

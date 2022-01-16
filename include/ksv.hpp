@@ -46,7 +46,7 @@ public:
     bool has_header();
     size_t row();
     size_t col();
-    void restart();
+    void start();
     std::string next_header();
     bool next_column();
     std::string next_data_by_column();

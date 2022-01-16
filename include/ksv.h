@@ -88,7 +88,7 @@ KSV_PUBLIC KSV_STATUS ksv_load_record(ksv_t *self, FILE *stream);
 KSV_PUBLIC BOOL ksv_has_header(ksv_t *self);
 KSV_PUBLIC size_t ksv_row(ksv_t *self);
 KSV_PUBLIC size_t ksv_col(ksv_t *self);
-KSV_PUBLIC void ksv_restart(ksv_t *self);
+KSV_PUBLIC void ksv_start(ksv_t *self);
 KSV_PUBLIC char * ksv_next_header(ksv_t *self);
 KSV_PUBLIC BOOL ksv_next_column(ksv_t *self);
 KSV_PUBLIC char * ksv_next_data_by_column(ksv_t *self);

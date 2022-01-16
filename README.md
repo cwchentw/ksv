@@ -157,7 +157,7 @@ while (!feof(fp)) {
     }
 
     /* Reset the internal index. */
-    ksv_restart(ksv);
+    ksv_start(ksv);
 
     /* Read each field in the record. */
     field = ksv_next_data_by_row(ksv);
@@ -225,7 +225,7 @@ while (!feof(fp)) {
         goto ERROR_MAIN;
     }
 
-    ksv->restart();
+    ksv->start();
 
     field = ksv->next_data_by_row();
     while (!field.empty()) {
@@ -299,6 +299,12 @@ We copy some utility code from [clibs](https://github.com/cwchentw/clibs).
 * Fail on trailing EOL in a CSV sheet
 * Our C++ binding may fail on some C++ compilers
 * `ksv table` cannot handle newline within fields well
+
+## Breaking Changes
+
+* 2022/01/16
+  * Change `ksv_restart()` to `ksv_start()` in C API
+  * Change `restart()` to `start()` for KSV objects in C++ API
 
 ## Copyright
 

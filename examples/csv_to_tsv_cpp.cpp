@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
         }
 
         /* Re-init the state of the ksv object. */
-        ksv->restart();
+        ksv->start();
 
         /* Iterate over the cell(s) of the row. */
         field = ksv->next_data_by_row();

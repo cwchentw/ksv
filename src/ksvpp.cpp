@@ -72,9 +72,9 @@ size_t KSV::col()
     return ksv_col(this->obj->ksv);
 }
 
-void KSV::restart()
+void KSV::start()
 {
-    ksv_restart(this->obj->ksv);
+    ksv_start(this->obj->ksv);
 }
 
 std::string KSV::next_header()
