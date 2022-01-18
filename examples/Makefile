@@ -76,7 +76,7 @@ ifeq ($(detected_OS),Darwin)
 else
 	LD_LIBRARY_PATH=. .$(SEP)$(EXEC_CSV_TO_TSV) ..$(SEP)$(DATA_DIR)$(SEP)iris_partial.csv
 ifeq ($(detected_OS),Linux)
-	LD_LIBRARY_PATH=. valgrind .$(SEP)$(EXEC_CSV_TO_TSV) ..$(SEP)$(DATA_DIR)$(SEP)iris_partial.csv
+	LD_LIBRARY_PATH=. valgrind --leak-check=full .$(SEP)$(EXEC_CSV_TO_TSV) ..$(SEP)$(DATA_DIR)$(SEP)iris_partial.csv
 endif  # Linux
 endif  # Darwin
 endif  # Windows
@@ -101,7 +101,7 @@ ifeq ($(detected_OS),Darwin)
 else
 	LD_LIBRARY_PATH=. .$(SEP)$(EXEC_CSV_TO_TSV_CPP) ..$(SEP)$(DATA_DIR)$(SEP)iris_partial.csv
 ifeq ($(detected_OS),Linux)
-	LD_LIBRARY_PATH=. valgrind .$(SEP)$(EXEC_CSV_TO_TSV_CPP) ..$(SEP)$(DATA_DIR)$(SEP)iris_partial.csv
+	LD_LIBRARY_PATH=. valgrind --leak-check=full .$(SEP)$(EXEC_CSV_TO_TSV_CPP) ..$(SEP)$(DATA_DIR)$(SEP)iris_partial.csv
 endif  # Linux
 endif  # Darwin
 endif  # Windows

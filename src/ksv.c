@@ -98,12 +98,12 @@ void ksv_delete(void *self)
 {
     assert(self);
 
-    size_t col = ((ksv_t *) self)->col;
+    size_t capacity_header = ((ksv_t *) self)->capacity_header;
 
     char **header = ((ksv_t *) self)->header;
     if (header) {
         size_t i;
-        for (i = 0; i < col; i++) {
+        for (i = 0; i < capacity_header; ++i) {
             if (header[i])
                 free((void *) header[i]);
         }
@@ -749,8 +749,10 @@ KSV_STATUS ksv_load_record(ksv_t *self, FILE *stream)
         /* Clean old fields. */
         size_t i;
         for (i = 0; i < self->capacity_rows; ++i) {
-            if (self->rows[i])
+            if (self->rows[i]) {
                 free((void *) self->rows[i]);
+                self->rows[i] = NULL;
+            }
         }
     }
 
