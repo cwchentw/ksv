@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
             if (KSV_SUCCESS != ksv_load_record(ksv, fp))
                 goto ERROR_KSV;
 
-            if (width != ksv_col(ksv)) {
+            if (width != ksv_col(ksv) && !feof(fp)) {
                 PUTERR("Unequal sheet width after row %lu", height);
                 goto ERROR_KSV;
             }

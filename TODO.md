@@ -1,5 +1,4 @@
 * (test) Add automated tests for `ksv` cli utility
-* (bug) Fix trailing EOL issue
 * (bug) C++ binding may fail on some C++ compiler
 * (feature) Add `ksv head`
 * (feature) Add `ksv tail`
