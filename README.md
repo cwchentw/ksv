@@ -296,7 +296,6 @@ We copy some utility code from [clibs](https://github.com/cwchentw/clibs).
 
 ## Known Issues or Bugs
 
-* Our C++ binding may fail on some C++ compilers
 * `ksv table` cannot handle newline within fields well
 
 ## Breaking Changes
@@ -307,4 +306,4 @@ We copy some utility code from [clibs](https://github.com/cwchentw/clibs).
 
 ## Copyright
 
-Copyright (c) 2020 Michelle Chen. Licensed under MIT.
+Copyright (c) 2020 ByteBard. Licensed under MIT.

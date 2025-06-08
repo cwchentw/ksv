@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#include "cstring.h"
 #include "ksv.h"
 #include "ksv_lexer.h"
 #include "ksv_parser.h"
@@ -87,9 +88,9 @@ ksv_t * ksv_new(char *delimeter, char *end_of_line, char *quote)
     csv->header = NULL;  /* CSV sheet may be header-less. */
     csv->rows = NULL;  /* Lazy row allocation. */
 
-    csv->delimeter = delimeter;
-    csv->end_of_line = end_of_line;
-    csv->quote = quote;
+    csv->delimeter = string_allocate(delimeter);
+    csv->end_of_line = string_allocate(end_of_line);
+    csv->quote = string_allocate(quote);
 
     return csv;
 }
@@ -97,6 +98,10 @@ ksv_t * ksv_new(char *delimeter, char *end_of_line, char *quote)
 void ksv_delete(void *self)
 {
     assert(self);
+
+    free((void *) ((ksv_t *) self)->delimeter);
+    free((void *) ((ksv_t *) self)->end_of_line);
+    free((void *) ((ksv_t *) self)->quote);
 
     size_t capacity_header = ((ksv_t *) self)->capacity_header;
 
