@@ -166,8 +166,11 @@ $ ksv help                            # Show usage
 
 ## Known Issues and Bugs
 
-* **Multiline Support**: `ksv table` does not currently support fields containing newline characters.
-* **Trailing Empty Lines**: `ksv stats` commands may crash when encountering a trailing empty line at the end of a CSV file.
+* **Multiline Support**: The `ksv table` command does not currently support fields containing embedded newline characters (non-compliant with RFC 4180).
+* **Robustness & Stability**:
+  * **Trailing & Blank Lines**: `ksv stats` and other commands may trigger a **segmentation fault** when encountering trailing empty lines at the end of a file or blank lines between data rows.
+  * **Irregular Row Lengths**: The parser expects a consistent column count; "ragged" rows (missing or extra delimiters) are not currently handled and may lead to undefined behavior or crashes.
+* **Memory Safety**: The library lacks strict bounds checking for malformed input, which can result in memory corruption when processing non-standard CSV structures.
 
 ## License
 
