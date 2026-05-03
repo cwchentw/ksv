@@ -164,9 +164,10 @@ $ ksv help                            # Show usage
 
 > Note: `ksv` CLI is provided for convenience and testing, and is not a fully featured CSV tool.
 
-## Known Issues
+## Known Issues and Bugs
 
-* `ksv table` does not properly handle multiline fields
+* **Multiline Support**: `ksv table` does not currently support fields containing newline characters.
+* **Trailing Empty Lines**: `ksv stats` commands may crash when encountering a trailing empty line at the end of a CSV file.
 
 ## License
 
